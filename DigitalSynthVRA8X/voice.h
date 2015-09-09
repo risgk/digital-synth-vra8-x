@@ -28,44 +28,20 @@ public:
 
   INLINE static void control_change(uint8_t controller_number, uint8_t controller_value) {
     switch (controller_number) {
-    case LFO_RATE:
-      ILFO<0>::set_rate(controller_value);
-      break;
     case LFO_RATE_EG_AMT:
       ILFO<0>::set_rate_eg_amt(controller_value);
-      break;
-    case LFO_LEVEL_EG_COEF:
-      ILFO<0>::set_level_eg_coef(controller_value);
       break;
     case VCO_COLOR_LFO_AMT:
       IVCO<0>::set_color_lfo_amt(controller_value);
       break;
-    case VCO_MIX:
-      IVCO<0>::set_mix(controller_value);
-      break;
     case VCO_MIX_EG_AMT:
       IVCO<0>::set_mix_eg_amt(controller_value);
-      break;
-    case VCO_PULSE_WIDTH:
-      IVCO<0>::set_pulse_width(controller_value);
-      break;
-    case VCO_SAW_SHIFT:
-      IVCO<0>::set_saw_shift(controller_value);
-      break;
-    case VCO_PORTAMENTO:
-      ISlewRateLimiter<0>::set_slew_time(controller_value);
-      break;
-    case VCF_CUTOFF:
-      IVCF<0>::set_cutoff(controller_value);
       break;
     case VCF_RESONANCE:
       IVCF<0>::set_resonance(controller_value);
       break;
     case VCF_CUTOFF_EG_AMT:
       IVCF<0>::set_cutoff_eg_amt(controller_value);
-      break;
-    case VCA_GAIN:
-      IVCA<0>::set_gain(controller_value);
       break;
     case EG_ATTACK:
       IEG<0>::set_attack(controller_value);
