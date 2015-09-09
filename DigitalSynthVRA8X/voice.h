@@ -7,11 +7,8 @@ class Voice {
 public:
   INLINE static void initialize() {
     IVCO<0>::initialize();
-    IVCF<0>::initialize();
     IVCA<0>::initialize();
     IEG<0>::initialize();
-    ILFO<0>::initialize();
-    ISlewRateLimiter<0>::initialize();
     m_note_number = NOTE_NUMBER_MIN;
   }
 
@@ -29,19 +26,19 @@ public:
   INLINE static void control_change(uint8_t controller_number, uint8_t controller_value) {
     switch (controller_number) {
     case LFO_RATE_EG_AMT:
-      ILFO<0>::set_rate_eg_amt(controller_value);
+      // TODO
       break;
     case VCO_COLOR_LFO_AMT:
-      IVCO<0>::set_color_lfo_amt(controller_value);
+      // TODO
       break;
     case VCO_MIX_EG_AMT:
-      IVCO<0>::set_mix_eg_amt(controller_value);
+      // TODO
       break;
     case VCF_RESONANCE:
-      IVCF<0>::set_resonance(controller_value);
+      // TODO
       break;
     case VCF_CUTOFF_EG_AMT:
-      IVCF<0>::set_cutoff_eg_amt(controller_value);
+      // TODO
       break;
     case EG_ATTACK:
       IEG<0>::set_attack(controller_value);
@@ -60,11 +57,8 @@ public:
 
   INLINE static int8_t clock() {
     uint8_t  eg_output = IEG<0>::clock();
-    int8_t   lfo_output = ILFO<0>::clock(eg_output);
-    uint16_t srl_output = ISlewRateLimiter<0>::clock(m_note_number << 8);
-    int16_t  vco_output = IVCO<0>::clock(srl_output, eg_output, lfo_output);
-    int16_t  vcf_output = IVCF<0>::clock(vco_output, eg_output);
-    int16_t  vca_output = IVCA<0>::clock(vcf_output, eg_output);
+    int16_t  vco_output = IVCO<0>::clock(m_note_number << 8, eg_output, 0);
+    int16_t  vca_output = IVCA<0>::clock(vco_output, eg_output);
     return high_sbyte(vca_output);
   }
 };

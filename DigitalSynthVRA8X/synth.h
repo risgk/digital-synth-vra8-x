@@ -6,20 +6,14 @@
 
 // associations of units
 #define IVCO             VCO
-#define IVCF             VCF
 #define IVCA             VCA
 #define IEG              EG
-#define ILFO             LFO
-#define ISlewRateLimiter SlewRateLimiter
 #define IVoice           Voice
 #define ISynthCore       SynthCore
 
 #include "vco.h"
-#include "vcf.h"
 #include "vca.h"
 #include "eg.h"
-#include "lfo.h"
-#include "slew-rate-limiter.h"
 #include "voice.h"
 #include "synth-core.h"
 

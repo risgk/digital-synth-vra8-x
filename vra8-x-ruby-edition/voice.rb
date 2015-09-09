@@ -3,11 +3,8 @@ require_relative 'common'
 class Voice
   def initialize
     @vco = IVCO.new
-    @vcf = IVCF.new
     @vca = IVCA.new
     @eg  = IEG.new
-    @lfo = ILFO.new
-    @srl = ISlewRateLimiter.new
     @note_number = NOTE_NUMBER_MIN
   end
 
@@ -25,15 +22,15 @@ class Voice
   def control_change(controller_number, controller_value)
     case (controller_number)
     when LFO_RATE_EG_AMT
-      @lfo.set_rate_eg_amt(controller_value)
+      # TODO
     when VCO_COLOR_LFO_AMT
-      @vco.set_color_lfo_amt(controller_value)
+      # TODO
     when VCO_MIX_EG_AMT
-      @vco.set_mix_eg_amt(controller_value)
+      # TODO
     when VCF_RESONANCE
-      @vcf.set_resonance(controller_value)
+      # TODO
     when VCF_CUTOFF_EG_AMT
-      @vcf.set_cutoff_eg_amt(controller_value)
+      # TODO
     when EG_ATTACK
       @eg.set_attack(controller_value)
     when EG_DECAY_RELEASE
@@ -47,11 +44,8 @@ class Voice
 
   def clock
     eg_output = @eg.clock
-    lfo_output = @lfo.clock(eg_output)
-    srl_output = @srl.clock(@note_number << 8)
-    vco_output = @vco.clock(srl_output, eg_output, lfo_output)
-    vcf_output = @vcf.clock(vco_output, eg_output)
-    vca_output = @vca.clock(vcf_output, eg_output)
+    vco_output = @vco.clock(@note_number << 8, eg_output, 0)
+    vca_output = @vca.clock(vco_output, eg_output)
     return high_sbyte(vca_output)
   end
 end

@@ -1,21 +1,15 @@
 require_relative 'common'
 
 require_relative 'vco'
-require_relative 'vcf'
 require_relative 'vca'
 require_relative 'eg'
-require_relative 'lfo'
-require_relative 'slew-rate-limiter'
 require_relative 'voice'
 require_relative 'synth-core'
 
 # associations of units
 IVCO             = VCO
-IVCF             = VCF
 IVCA             = VCA
 IEG              = EG
-ILFO             = LFO
-ISlewRateLimiter = SlewRateLimiter
 IVoice           = Voice
 ISynthCore       = SynthCore
 
