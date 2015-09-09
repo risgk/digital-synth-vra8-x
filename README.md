@@ -1,11 +1,11 @@
-# Digital Synth VRA8-M 1.1.0
+# Digital Synth VRA8-X 0.0.0
 
-- 2015-08-11 ISGK Instruments
-- <https://github.com/risgk/digital-synth-vra8-m>
+- 20**-**-** ISGK Instruments
+- <https://github.com/risgk/digital-synth-vra8-x>
 
 ## Concept
 
-- Monophonic Synthesizer (MIDI Sound Module) for Arduino Uno
+- Digital Synthesizer (MIDI Sound Module) for Arduino Uno
 
 ## Features
 
@@ -15,7 +15,7 @@
 - VCF Type (Attenuation Slope): LPF (-12 dB/oct)
 - Recommending [Hairless MIDI<->Serial Bridge](http://projectgus.github.io/hairless-midiserial/) to connect PC
 - Files
-    - `DigitalSynthVRA8M/DigitalSynthVRA8M.ino` is for Arduino Uno
+    - `DigitalSynthVRA8X/DigitalSynthVRA8X.ino` is for Arduino Uno
     - `MakeSampleWavFile.cc` is for Debugging on PC, `make-sample-wav-file-cc.bat` makes a sample WAV file
         - Requiring GCC (G++) or other
 
@@ -84,8 +84,8 @@
 
 ## MIDI Implementation Chart
 
-      [Monophonic Synthesizer]                                        Date: 2015-08-11       
-      Model  Digital Synth VRA8-M     MIDI Implementation Chart       Version: 1.1.0         
+      [Monophonic Synthesizer]                                        Date: 20**-**-**       
+      Model  Digital Synth VRA8-M     MIDI Implementation Chart       Version: 0.0.0         
     +-------------------------------+---------------+---------------+-----------------------+
     | Function...                   | Transmitted   | Recognized    | Remarks               |
     +-------------------------------+---------------+---------------+-----------------------+
