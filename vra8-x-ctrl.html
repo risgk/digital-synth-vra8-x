@@ -38,15 +38,15 @@ const NOTE_OFF       = 0x80;
 const NOTE_ON        = 0x90;
 const CONTROL_CHANGE = 0xB0;
 
-const LFO_RATE_EG_AMT   = 16;
-const VCO_COLOR_LFO_AMT = 17;
-const VCO_MIX_EG_AMT    = 18;
-const VCF_CUTOFF_EG_AMT = 19;
-const VCF_RESONANCE     = 20;
-const EG_ATTACK         = 21;
-const EG_DECAY_RELEASE  = 22;
-const EG_SUSTAIN        = 23;
-const ALL_NOTES_OFF     = 123;
+const OSC_TYPE      = 16;
+const OSC_COLOR     = 17;
+const MOD_FREQ      = 18;
+const MOD_DEPTH     = 19;
+const ENV_A         = 20;
+const ENV_D         = 21;
+const ENV_S         = 22;
+const ENV_R         = 23;
+const ALL_NOTES_OFF = 123;
 
 const CONTROLLERS_FIRST = 16;
 const CONTROLLERS_LAST  = 23;
@@ -85,7 +85,7 @@ function sleep(msec) {
 
 function soundOff() {
   if (midiOutput) {
-    midiOutput.send([(CONTROL_CHANGE | MIDI_CH), EG_DECAY_RELEASE, 0]);
+    midiOutput.send([(CONTROL_CHANGE | MIDI_CH), ENV_R        , 0]);
     sleep(2);
     midiOutput.send([(CONTROL_CHANGE | MIDI_CH), ALL_NOTES_OFF, 0]);
     sleep(50);
@@ -198,7 +198,23 @@ function onChangeOutputPort() {
 
 function onChangeControlChange(number, value) {
   document.getElementById("inputCC" + String(number)).value = parseInt(value);
-  document.getElementById("spanCC" + String(number)).innerHTML = value;
+  if (number == OSC_TYPE) {
+    var str = "";
+    if (value < 16) {
+      str = "FM";
+    } else if (value < 48) {
+      str = "AM";
+    } else if (value < 80) {
+      str = "XOR";
+    } else if (value < 112) {
+      str = "Nil";  // Reserved 3
+    } else {
+      str = "Nil";  // Reserved 4
+    }
+    document.getElementById("spanCC" + String(number)).innerHTML = str;
+  } else {
+    document.getElementById("spanCC" + String(number)).innerHTML = value;
+  }
   localStorage.setItem("keyCC" + String(number), value);
   if (midiOutput) {
     midiOutput.send([(CONTROL_CHANGE | MIDI_CH), number, parseInt(value)]);
@@ -209,29 +225,37 @@ function onChangeControlChange(number, value) {
 function preset(number) {
   soundOff();
   var presetControllers = {};
-  presetControllers[LFO_RATE_EG_AMT  ] = [0  , 8  , 8  , 0  , 0  , 0  , 0  ];
-  presetControllers[VCO_COLOR_LFO_AMT] = [64 , 32 , 32 , 0  , 0  , 0  , 0  ];
-  presetControllers[VCO_MIX_EG_AMT   ] = [127, 64 , 0  , 0  , 0  , 0  , 0  ];
-  presetControllers[VCF_CUTOFF_EG_AMT] = [127, 127, 127, 0  , 0  , 0  , 0  ];
-  presetControllers[VCF_RESONANCE    ] = [64 , 127, 0  , 0  , 0  , 0  , 0  ];
-  presetControllers[EG_ATTACK        ] = [32 , 32 , 96 , 0  , 0  , 0  , 0  ];
-  presetControllers[EG_DECAY_RELEASE ] = [96 , 96 , 112, 0  , 0  , 0  , 0  ];
-  presetControllers[EG_SUSTAIN       ] = [127, 0  , 64 , 127, 127, 127, 127];
+  presetControllers[OSC_TYPE ] = [0  , 32 , 64 ];
+  presetControllers[OSC_COLOR] = [64 , 64 , 64 ];
+  presetControllers[MOD_FREQ ] = [8  , 8  , 8  ];
+  presetControllers[MOD_DEPTH] = [64 , 64 , 64 ];
+  presetControllers[ENV_A    ] = [64 , 64 , 64 ];
+  presetControllers[ENV_D    ] = [64 , 64 , 64 ];
+  presetControllers[ENV_S    ] = [64 , 64 , 64 ];
+  presetControllers[ENV_R    ] = [64 , 64 , 64 ];
 
   for (var i = CONTROLLERS_FIRST; i <= CONTROLLERS_LAST; i++) {
     onChangeControlChange(i, presetControllers[i][number]);
   }
 }
 
-function setRandomA() {
+function setRandom() {
   soundOff();
   for (var i = CONTROLLERS_FIRST; i <= CONTROLLERS_LAST; i++) {
-    onChangeControlChange(i, rand());
+    if (i == OSC_TYPE) {
+      var v = rand(3) * 32;
+      if (v > 127) {
+        v = 127;
+      }
+      onChangeControlChange(i, v);
+    } else {
+      onChangeControlChange(i, rand(128));
+    }
   }
 }
 
-function rand() {
-  return Math.floor(Math.random() * 128);
+function rand(n) {
+  return Math.floor(Math.random() * n);
 }
 
 function loadControllers(number) {
@@ -290,17 +314,16 @@ function noteOff(noteNumber) {
     <td><input id="inputTranspose" type="range" min="-24" max="12" step="12" oninput="onChangeTranspose(value)" ></td><td><span id="spanTranspose" >-1</span></td></tr>
 </table>
 
+&nbsp;
+
 <table>
-<tr><td><input type="button" value="Preset Lead" onclick="preset(0)"></td>
-    <td><input type="button" value="Preset Bass" onclick="preset(1)"></td>
-    <td><input type="button" value="Preset Pad"  onclick="preset(2)"></td>
+<tr><td><input type="button" value="Preset FM"   onclick="preset(0)"></td>
+    <td><input type="button" value="Preset AM"   onclick="preset(1)"></td>
+    <td><input type="button" value="Preset XOR"  onclick="preset(2)"></td>
+<!--<td><input type="button" value="Reserved 3"  onclick="preset(3)"></td>-->
+<!--<td><input type="button" value="Reserved 4"  onclick="preset(4)"></td>-->
     <td>&nbsp;</td>
-    <td><input type="button" value="Saw"         onclick="preset(3)"></td>
-    <td><input type="button" value="Square"      onclick="preset(4)"></td>
-    <td><input type="button" value="Pulse 25%"   onclick="preset(5)"></td>
-    <td><input type="button" value="Pulse 12.5%" onclick="preset(6)"></td>
-    <td>&nbsp;</td>
-    <td><input type="button" value="Random A"    onclick="setRandomA()"></td></tr>
+    <td><input type="button" value="Random"      onclick="setRandom()"></td></tr>
 </table>
 
 <table>
@@ -317,24 +340,29 @@ function noteOff(noteNumber) {
     <td><input type="button" value="Save #4" onclick="saveControllers(4)"></td></tr>
 </table>
 
+&nbsp;
+
 <table>
-<tr><td>LFO Rate EG Amt       </td><td></td>
-    <td>VCO Color LFO Amt     </td><td></td>
-    <td>VCO Mix EG Amt        </td><td></td>
-    <td>VCF Cutoff EG Amt     </td><td></td></tr>
+<tr><td>OSC TYPE </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>OSC COLOR</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>MOD FREQ </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>MOD DEPTH</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
 <tr><td><input id="inputCC16" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(16, value)"></td><td><span id="spanCC16">-1</span></td>
     <td><input id="inputCC17" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(17, value)"></td><td><span id="spanCC17">-1</span></td>
     <td><input id="inputCC18" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(18, value)"></td><td><span id="spanCC18">-1</span></td>
     <td><input id="inputCC19" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(19, value)"></td><td><span id="spanCC19">-1</span></td></tr>
-<tr><td>VCF Resonance         </td><td></td>
-    <td>EG Attack             </td><td></td>
-    <td>EG Decay/Release      </td><td></td>
-    <td>EG Sustain            </td><td></td></tr>
+<tr><td>&nbsp;   </td><td></td></tr>
+<tr><td>ENV A    </td><td></td>
+    <td>ENV D    </td><td></td>
+    <td>ENV S    </td><td></td>
+    <td>ENV R    </td><td></td></tr>
 <tr><td><input id="inputCC20" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(20, value)"></td><td><span id="spanCC20">-1</span></td>
     <td><input id="inputCC21" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(21, value)"></td><td><span id="spanCC21">-1</span></td>
     <td><input id="inputCC22" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(22, value)"></td><td><span id="spanCC22">-1</span></td>
     <td><input id="inputCC23" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(23, value)"></td><td><span id="spanCC23">-1</span></td></tr>
 </table>
+
+&nbsp;
 
 <table>
 <tr>

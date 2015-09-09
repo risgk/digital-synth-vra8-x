@@ -21,22 +21,22 @@ class Voice
 
   def control_change(controller_number, controller_value)
     case (controller_number)
-    when LFO_RATE_EG_AMT
+    when OSC_TYPE
       # TODO
-    when VCO_COLOR_LFO_AMT
+    when OSC_COLOR
       # TODO
-    when VCO_MIX_EG_AMT
+    when MOD_FREQ
       # TODO
-    when VCF_RESONANCE
+    when MOD_DEPTH
       # TODO
-    when VCF_CUTOFF_EG_AMT
-      # TODO
-    when EG_ATTACK
+    when ENV_A
       @eg.set_attack(controller_value)
-    when EG_DECAY_RELEASE
+    when ENV_D
       @eg.set_decay_release(controller_value)
-    when EG_SUSTAIN
+    when ENV_S
       @eg.set_sustain(controller_value)
+    when ENV_R
+      # TODO
     when ALL_NOTES_OFF
       @eg.note_off
     end

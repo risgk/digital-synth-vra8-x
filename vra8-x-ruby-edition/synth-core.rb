@@ -10,7 +10,14 @@ class SynthCore
     @first_data = DATA_BYTE_INVALID
 
     # Preset Lead
-    # TODO
+    control_change(OSC_TYPE , 0  )
+    control_change(OSC_COLOR, 64 )
+    control_change(MOD_FREQ , 8  )
+    control_change(MOD_DEPTH, 64 )
+    control_change(ENV_A    , 64 )
+    control_change(ENV_D    , 64 )
+    control_change(ENV_S    , 64 )
+    control_change(ENV_R    , 64 )
   end
 
   def receive_midi_byte(b)

@@ -25,29 +25,29 @@ public:
 
   INLINE static void control_change(uint8_t controller_number, uint8_t controller_value) {
     switch (controller_number) {
-    case LFO_RATE_EG_AMT:
+    case OSC_TYPE:
       // TODO
       break;
-    case VCO_COLOR_LFO_AMT:
+    case OSC_COLOR:
       // TODO
       break;
-    case VCO_MIX_EG_AMT:
+    case MOD_FREQ:
       // TODO
       break;
-    case VCF_RESONANCE:
+    case MOD_DEPTH:
       // TODO
       break;
-    case VCF_CUTOFF_EG_AMT:
-      // TODO
-      break;
-    case EG_ATTACK:
+    case ENV_A:
       IEG<0>::set_attack(controller_value);
       break;
-    case EG_DECAY_RELEASE:
+    case ENV_D:
       IEG<0>::set_decay_release(controller_value);
       break;
-    case EG_SUSTAIN:
+    case ENV_S:
       IEG<0>::set_sustain(controller_value);
+      break;
+    case ENV_R:
+      // TODO
       break;
     case ALL_NOTES_OFF:
       IEG<0>::note_off();
