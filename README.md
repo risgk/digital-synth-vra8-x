@@ -19,28 +19,12 @@
     - `MakeSampleWavFile.cc` is for Debugging on PC, `make-sample-wav-file-cc.bat` makes a sample WAV file
         - Requiring GCC (G++) or other
 
-## VRA8-M CTRL
+## VRA8-X CTRL
 
-- Parameter Editor (MIDI Controller) for VRA8-M, Web App
+- Parameter Editor (MIDI Controller) for VRA8-X, Web App
 - We recommend Google Chrome, which implements Web MIDI API
-- Recommending [loopMIDI](http://www.tobias-erichsen.de/software/loopmidi.html) (virtual loopback MIDI cable) to connect VRA8-M
+- Recommending [loopMIDI](http://www.tobias-erichsen.de/software/loopmidi.html) (virtual loopback MIDI cable) to connect VRA8-X
 - CAUTION: Click sounds occur sometimes when you change the controllers
-
-## VRA8-M Ruby Edition
-
-- Software Synthesizer for Windows, Faithful Simulator of VRA8-M
-- Sampling Rate: 15625 Hz, Bit Depth: 8 bits
-- Requiring Ruby (JRuby), UniMIDI, and win32-sound
-    - `jgem install unimidi`
-    - `jgem install win32-sound`
-    - CAUTION: Following operations (with CRuby) also may be required to install these
-        - `gem install unimidi`
-        - `gem install win32-sound`
-- Usage
-    - `start-var8-m-rb.bat` starts VRA8-M Ruby Edition
-    - `make-sample-wav-file-rb.bat` makes a sample WAV file
-- Known Issues
-    - VRA8-M Ruby Edition spends the full power of 2 CPU cores...
 
 ## Controllers
 
@@ -85,7 +69,7 @@
 ## MIDI Implementation Chart
 
       [Monophonic Synthesizer]                                        Date: 20**-**-**       
-      Model  Digital Synth VRA8-M     MIDI Implementation Chart       Version: 0.0.0         
+      Model  Digital Synth VRA8-X     MIDI Implementation Chart       Version: 0.0.0         
     +-------------------------------+---------------+---------------+-----------------------+
     | Function...                   | Transmitted   | Recognized    | Remarks               |
     +-------------------------------+---------------+---------------+-----------------------+
