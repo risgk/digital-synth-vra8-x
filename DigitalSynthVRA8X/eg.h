@@ -45,16 +45,25 @@ public:
   }
 
   INLINE static void note_on() {
+#if 0
     m_state = STATE_ATTACK;
     m_count = EG_ATTACK_UPDATE_INTERVAL;
+#else
+    m_level = EG_LEVEL_MAX;
+#endif
   }
 
   INLINE static void note_off() {
+#if 0
     m_state = STATE_RELEASE;
     m_count = m_decay_release_update_interval;
+#else
+    m_level = 0;
+#endif
   }
 
   INLINE static int8_t clock() {
+#if 0
     switch (m_state) {
     case STATE_ATTACK:
       m_count--;
@@ -98,6 +107,7 @@ public:
       m_level = 0;
       break;
     }
+#endif
     return high_byte(m_level);
   }
 };

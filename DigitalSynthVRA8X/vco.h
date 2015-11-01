@@ -50,16 +50,16 @@ public:
     uint8_t coarse_pitch = high_byte(pitch_control);
     uint8_t fine_pitch = low_byte(pitch_control);
 
-    m_wave_table = g_vco_wave_tables[coarse_pitch - (NOTE_NUMBER_MIN - 1)];
+    m_wave_table = NULL;
     uint16_t freq = mul_q16_q16(g_vco_freq_table[coarse_pitch - (NOTE_NUMBER_MIN - 1)],
                                 g_vco_tune_rate_table[fine_pitch >>
                                                       (8 - VCO_TUNE_RATE_TABLE_STEPS_BITS)]);
     m_phase += freq;
 
     uint16_t shift_lfo = (mod_lfo_control * m_color_lfo_amt);
-    int8_t saw_down      = +get_saw_wave_level(m_phase);
-    int8_t saw_up        = -get_saw_wave_level(m_phase + m_pulse_width - shift_lfo);
-    int8_t saw_down_copy = +get_saw_wave_level(m_phase + m_saw_shift   + shift_lfo);
+    int8_t saw_down      = +high_byte(m_phase);
+    int8_t saw_up        = -high_byte(m_phase + m_pulse_width - shift_lfo);
+    int8_t saw_down_copy = +high_byte(m_phase + m_saw_shift   + shift_lfo);
 
     uint8_t mix = m_mix + high_byte(m_mix_eg_amt * mod_eg_control);
     if (mix > 127) {
@@ -73,18 +73,7 @@ public:
   }
 
 private:
-  INLINE static int8_t get_saw_wave_level(uint16_t phase) {
-    uint8_t curr_index = high_byte(phase);
-    uint16_t tmp = pgm_read_word(m_wave_table + curr_index);
-    int8_t curr_data = low_byte(tmp);
-    int8_t next_data = high_byte(tmp);
-    uint8_t next_weight = low_byte(phase);
-
-    // lerp
-    int8_t level = curr_data + high_sbyte((next_data - curr_data) * next_weight);
-
-    return level;
-  }
+  // todo
 };
 
 template <uint8_t T> const uint8_t* VCO<T>::m_wave_table;
