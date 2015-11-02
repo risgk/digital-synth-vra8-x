@@ -38,14 +38,14 @@ const NOTE_OFF       = 0x80;
 const NOTE_ON        = 0x90;
 const CONTROL_CHANGE = 0xB0;
 
-const OSC_TYPE      = 16;
+const OSC_MODE      = 16;
 const OSC_COLOR     = 17;
-const MOD_FREQ      = 18;
+const MOD_RATE      = 18;
 const MOD_DEPTH     = 19;
-const ENV_A         = 20;
-const ENV_D         = 21;
-const ENV_S         = 22;
-const ENV_R         = 23;
+const LPF_CUTOFF    = 20;
+const LPF_RESONANCE = 21;
+const ENV_A         = 22;
+const ENV_D         = 23;
 const ALL_NOTES_OFF = 123;
 
 const CONTROLLERS_FIRST = 16;
@@ -85,7 +85,7 @@ function sleep(msec) {
 
 function soundOff() {
   if (midiOutput) {
-    midiOutput.send([(CONTROL_CHANGE | MIDI_CH), ENV_R        , 0]);
+    midiOutput.send([(CONTROL_CHANGE | MIDI_CH), ENV_D        , 0]);
     sleep(2);
     midiOutput.send([(CONTROL_CHANGE | MIDI_CH), ALL_NOTES_OFF, 0]);
     sleep(50);
@@ -198,7 +198,7 @@ function onChangeOutputPort() {
 
 function onChangeControlChange(number, value) {
   document.getElementById("inputCC" + String(number)).value = parseInt(value);
-  if (number == OSC_TYPE) {
+  if (number == OSC_MODE) {
     var str = "";
     if (value < 16) {
       str = "FM";
@@ -225,14 +225,14 @@ function onChangeControlChange(number, value) {
 function preset(number) {
   soundOff();
   var presetControllers = {};
-  presetControllers[OSC_TYPE ] = [0  , 32 , 64 ];
-  presetControllers[OSC_COLOR] = [64 , 64 , 64 ];
-  presetControllers[MOD_FREQ ] = [8  , 8  , 8  ];
-  presetControllers[MOD_DEPTH] = [64 , 64 , 64 ];
-  presetControllers[ENV_A    ] = [64 , 64 , 64 ];
-  presetControllers[ENV_D    ] = [64 , 64 , 64 ];
-  presetControllers[ENV_S    ] = [64 , 64 , 64 ];
-  presetControllers[ENV_R    ] = [64 , 64 , 64 ];
+  presetControllers[OSC_MODE     ] = [0  , 32 , 64 ];
+  presetControllers[OSC_COLOR    ] = [64 , 64 , 64 ];
+  presetControllers[MOD_RATE     ] = [8  , 8  , 8  ];
+  presetControllers[MOD_DEPTH    ] = [64 , 64 , 64 ];
+  presetControllers[LPF_CUTOFF   ] = [64 , 64 , 64 ];
+  presetControllers[LPF_RESONANCE] = [64 , 64 , 64 ];
+  presetControllers[ENV_A        ] = [64 , 64 , 64 ];
+  presetControllers[ENV_D        ] = [64 , 64 , 64 ];
 
   for (var i = CONTROLLERS_FIRST; i <= CONTROLLERS_LAST; i++) {
     onChangeControlChange(i, presetControllers[i][number]);
@@ -242,7 +242,7 @@ function preset(number) {
 function setRandom() {
   soundOff();
   for (var i = CONTROLLERS_FIRST; i <= CONTROLLERS_LAST; i++) {
-    if (i == OSC_TYPE) {
+    if (i == OSC_MODE) {
       var v = rand(3) * 32;
       if (v > 127) {
         v = 127;
@@ -347,19 +347,19 @@ function noteOff(noteNumber) {
 &nbsp;
 
 <table>
-<tr><td>OSC TYPE </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>OSC COLOR</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>MOD FREQ </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>MOD DEPTH</td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
+<tr><td>OSC MODE  </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>OSC COLOR </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>MOD RATE  </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>MOD DEPTH </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
 <tr><td><input id="inputCC16" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(16, value)"></td><td><span id="spanCC16">-1</span></td>
     <td><input id="inputCC17" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(17, value)"></td><td><span id="spanCC17">-1</span></td>
     <td><input id="inputCC18" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(18, value)"></td><td><span id="spanCC18">-1</span></td>
     <td><input id="inputCC19" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(19, value)"></td><td><span id="spanCC19">-1</span></td></tr>
-<tr><td>&nbsp;   </td><td></td></tr>
-<tr><td>ENV A    </td><td></td>
-    <td>ENV D    </td><td></td>
-    <td>ENV S    </td><td></td>
-    <td>ENV R    </td><td></td></tr>
+<tr><td>&nbsp;    </td><td></td></tr>
+<tr><td>LPF CUTOFF</td><td></td>
+    <td>LPF RESO  </td><td></td>
+    <td>ENV A     </td><td></td>
+    <td>ENV D     </td><td></td></tr>
 <tr><td><input id="inputCC20" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(20, value)"></td><td><span id="spanCC20">-1</span></td>
     <td><input id="inputCC21" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(21, value)"></td><td><span id="spanCC21">-1</span></td>
     <td><input id="inputCC22" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(22, value)"></td><td><span id="spanCC22">-1</span></td>

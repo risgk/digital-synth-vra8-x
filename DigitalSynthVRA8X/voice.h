@@ -25,28 +25,28 @@ public:
 
   INLINE static void control_change(uint8_t controller_number, uint8_t controller_value) {
     switch (controller_number) {
-    case OSC_TYPE:
+    case OSC_MODE:
       // TODO
       break;
     case OSC_COLOR:
       // TODO
       break;
-    case MOD_FREQ:
+    case MOD_RATE:
       // TODO
       break;
     case MOD_DEPTH:
       // TODO
       break;
-    case ENV_A:
+    case LPF_CUTOFF:
       IEnv<0>::set_attack(controller_value);
       break;
-    case ENV_D:
+    case LPF_RESONANCE:
       IEnv<0>::set_decay_release(controller_value);
       break;
-    case ENV_S:
+    case ENV_A:
       IEnv<0>::set_sustain(controller_value);
       break;
-    case ENV_R:
+    case ENV_D:
       // TODO
       break;
     case ALL_NOTES_OFF:

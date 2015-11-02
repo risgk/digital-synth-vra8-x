@@ -20,14 +20,14 @@ public:
     m_first_data = DATA_BYTE_INVALID;
 
     // Preset Lead
-    control_change(OSC_TYPE , 0  );
-    control_change(OSC_COLOR, 64 );
-    control_change(MOD_FREQ , 8  );
-    control_change(MOD_DEPTH, 64 );
-    control_change(ENV_A    , 64 );
-    control_change(ENV_D    , 64 );
-    control_change(ENV_S    , 64 );
-    control_change(ENV_R    , 64 );
+    control_change(OSC_MODE     , 0  );
+    control_change(OSC_COLOR    , 64 );
+    control_change(MOD_RATE     , 8  );
+    control_change(MOD_DEPTH    , 64 );
+    control_change(LPF_CUTOFF   , 64 );
+    control_change(LPF_RESONANCE, 64 );
+    control_change(ENV_A        , 64 );
+    control_change(ENV_D        , 64 );
   }
 
   INLINE static void receive_midi_byte(uint8_t b) {

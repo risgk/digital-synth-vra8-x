@@ -30,7 +30,7 @@ def play_cegbdfac(c)
 end
 
 def sound_off
-  control_change(ENV_R        , 0  )
+  control_change(ENV_D        , 0  )
   control_change(ALL_NOTES_OFF, 0  )
   wait(800)
 end
@@ -38,14 +38,14 @@ end
 sound_off
 
 # Preset Lead
-control_change(OSC_TYPE , 0  )
-control_change(OSC_COLOR, 64 )
-control_change(MOD_FREQ , 8  )
-control_change(MOD_DEPTH, 64 )
-control_change(ENV_A    , 64 )
-control_change(ENV_D    , 64 )
-control_change(ENV_S    , 64 )
-control_change(ENV_R    , 64 )
+control_change(OSC_MODE     , 0  )
+control_change(OSC_COLOR    , 64 )
+control_change(MOD_RATE     , 8  )
+control_change(MOD_DEPTH    , 64 )
+control_change(LPF_CUTOFF   , 64 )
+control_change(LPF_RESONANCE, 64 )
+control_change(ENV_A        , 64 )
+control_change(ENV_D        , 64 )
 play_cegbdfac(3)
 
 sound_off
