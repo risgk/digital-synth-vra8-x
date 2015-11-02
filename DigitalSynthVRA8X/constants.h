@@ -8,11 +8,9 @@ const uint8_t   BIT_DEPTH       = 8;
 const uint8_t   NOTE_NUMBER_MIN = 24;
 const uint8_t   NOTE_NUMBER_MAX = 84;
 
-const uint8_t   VCO_TUNE_RATE_TABLE_STEPS_BITS         = 6;
-const uint8_t   VCO_TUNE_RATE_DENOMINATOR_BITS         = 16;
-const uint8_t   VCO_PHASE_RESOLUTION_BITS              = 16;
-const uint8_t   VCO_WAVE_TABLE_AMPLITUDE               = 96;
-const uint8_t   VCO_WAVE_TABLE_SAMPLES_BITS            = 8;
+const uint8_t   OSC_TUNE_RATE_TABLE_STEPS_BITS         = 6;
+const uint8_t   OSC_TUNE_RATE_DENOMINATOR_BITS         = 16;
+const uint8_t   OSC_PHASE_RESOLUTION_BITS              = 16;
 const uint8_t   VCF_TABLE_FRACTION_BITS                = 14;
 const uint16_t  EG_LEVEL_MAX                           = (127 << 1) << 8;
 const uint8_t   EG_CONTROLLER_STEPS_BITS               = 5;

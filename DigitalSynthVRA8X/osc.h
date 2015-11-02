@@ -2,10 +2,10 @@
 
 #include "common.h"
 #include "mul-q.h"
-#include "vco-table.h"
+#include "osc-table.h"
 
 template <uint8_t T>
-class VCO {
+class Osc {
    static const uint8_t* m_wave_table;
    static uint16_t       m_phase;
    static uint8_t        m_mix;
@@ -51,9 +51,9 @@ public:
     uint8_t fine_pitch = low_byte(pitch_control);
 
     m_wave_table = NULL;
-    uint16_t freq = mul_q16_q16(g_vco_freq_table[coarse_pitch - (NOTE_NUMBER_MIN - 1)],
-                                g_vco_tune_rate_table[fine_pitch >>
-                                                      (8 - VCO_TUNE_RATE_TABLE_STEPS_BITS)]);
+    uint16_t freq = mul_q16_q16(g_osc_freq_table[coarse_pitch - (NOTE_NUMBER_MIN - 1)],
+                                g_osc_tune_rate_table[fine_pitch >>
+                                                      (8 - OSC_TUNE_RATE_TABLE_STEPS_BITS)]);
     m_phase += freq;
 
     uint16_t shift_lfo = (mod_lfo_control * m_color_lfo_amt);
@@ -76,10 +76,10 @@ private:
   // todo
 };
 
-template <uint8_t T> const uint8_t* VCO<T>::m_wave_table;
-template <uint8_t T> uint16_t       VCO<T>::m_phase;
-template <uint8_t T> uint8_t        VCO<T>::m_mix;
-template <uint8_t T> uint8_t        VCO<T>::m_mix_eg_amt;
-template <uint8_t T> uint16_t       VCO<T>::m_pulse_width;
-template <uint8_t T> uint16_t       VCO<T>::m_saw_shift;
-template <uint8_t T> uint8_t        VCO<T>::m_color_lfo_amt;
+template <uint8_t T> const uint8_t* Osc<T>::m_wave_table;
+template <uint8_t T> uint16_t       Osc<T>::m_phase;
+template <uint8_t T> uint8_t        Osc<T>::m_mix;
+template <uint8_t T> uint8_t        Osc<T>::m_mix_eg_amt;
+template <uint8_t T> uint16_t       Osc<T>::m_pulse_width;
+template <uint8_t T> uint16_t       Osc<T>::m_saw_shift;
+template <uint8_t T> uint8_t        Osc<T>::m_color_lfo_amt;

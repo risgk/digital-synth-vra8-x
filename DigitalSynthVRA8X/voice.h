@@ -6,8 +6,8 @@ class Voice {
 
 public:
   INLINE static void initialize() {
-    IVCO<0>::initialize();
-    IVCA<0>::initialize();
+    IOsc<0>::initialize();
+    IAmp<0>::initialize();
     IEG<0>::initialize();
     m_note_number = NOTE_NUMBER_MIN;
   }
@@ -57,9 +57,9 @@ public:
 
   INLINE static int8_t clock() {
     uint8_t  eg_output = IEG<0>::clock();
-    int16_t  vco_output = IVCO<0>::clock(m_note_number << 8, eg_output, 0);
-    int16_t  vca_output = IVCA<0>::clock(vco_output, eg_output);
-    return high_sbyte(vca_output);
+    int16_t  osc_output = IOsc<0>::clock(m_note_number << 8, eg_output, 0);
+    int16_t  amp_output = IAmp<0>::clock(osc_output, eg_output);
+    return high_sbyte(amp_output);
   }
 };
 

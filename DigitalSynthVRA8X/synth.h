@@ -5,14 +5,14 @@
 #include "common.h"
 
 // associations of units
-#define IVCO             VCO
-#define IVCA             VCA
+#define IOsc             Osc
+#define IAmp             Amp
 #define IEG              EG
 #define IVoice           Voice
 #define ISynthCore       SynthCore
 
-#include "vco.h"
-#include "vca.h"
+#include "osc.h"
+#include "amp.h"
 #include "eg.h"
 #include "voice.h"
 #include "synth-core.h"
