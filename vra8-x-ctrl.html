@@ -199,17 +199,18 @@ function onChangeOutputPort() {
 function onChangeControlChange(number, value) {
   document.getElementById("inputCC" + String(number)).value = parseInt(value);
   if (number == OSC_MODE) {
+    var mode = Math.floor((parseInt(value) + 8) / 16) + 1;
     var str = "";
-    if (value < 16) {
-      str = "FM";
-    } else if (value < 48) {
-      str = "AM";
-    } else if (value < 80) {
-      str = "XOR";
-    } else if (value < 112) {
-      str = "Nil";  // Reserved 3
-    } else {
-      str = "Nil";  // Reserved 4
+    switch (mode) {
+    case 1: str = "1: FM";       break;
+    case 2: str = "2: (RSVD)";   break;
+    case 3: str = "3: SAW+XOR";  break;
+    case 4: str = "4: (RSVD)";   break;
+    case 5: str = "5: PWM+SAW";  break;
+    case 6: str = "6: (RSVD)";   break;
+    case 7: str = "7: SYNC+FM";  break;
+    case 8: str = "8: (RSVD)";   break;
+    case 9: str = "9: RING+PWM"; break;
     }
     document.getElementById("spanCC" + String(number)).innerHTML = str;
   } else {
@@ -225,17 +226,17 @@ function onChangeControlChange(number, value) {
 function preset(number) {
   soundOff();
   var presetControllers = {};
-  presetControllers[OSC_MODE     ] = [0  , 32 , 64 ];
-  presetControllers[OSC_COLOR    ] = [64 , 64 , 64 ];
-  presetControllers[MOD_RATE     ] = [8  , 8  , 8  ];
-  presetControllers[MOD_DEPTH    ] = [64 , 64 , 64 ];
-  presetControllers[LPF_CUTOFF   ] = [64 , 64 , 64 ];
-  presetControllers[LPF_RESONANCE] = [64 , 64 , 64 ];
-  presetControllers[ENV_A        ] = [64 , 64 , 64 ];
-  presetControllers[ENV_D        ] = [64 , 64 , 64 ];
+  presetControllers[OSC_MODE     ] = [0  , 16 , 32 , 48 , 64 , 80 , 96 , 112, 127 ];
+  presetControllers[OSC_COLOR    ] = [64 , 64 , 64 , 64 , 64 , 64 , 64 , 64 , 64  ];
+  presetControllers[MOD_RATE     ] = [64 , 64 , 64 , 64 , 64 , 64 , 64 , 64 , 64  ];
+  presetControllers[MOD_DEPTH    ] = [64 , 64 , 64 , 64 , 64 , 64 , 64 , 64 , 64  ];
+  presetControllers[LPF_CUTOFF   ] = [64 , 64 , 64 , 64 , 64 , 64 , 64 , 64 , 64  ];
+  presetControllers[LPF_RESONANCE] = [64 , 64 , 64 , 64 , 64 , 64 , 64 , 64 , 64  ];
+  presetControllers[ENV_A        ] = [0  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0   ];
+  presetControllers[ENV_D        ] = [127, 127, 127, 127, 127, 127, 127, 127, 127 ];
 
   for (var i = CONTROLLERS_FIRST; i <= CONTROLLERS_LAST; i++) {
-    onChangeControlChange(i, presetControllers[i][number]);
+    onChangeControlChange(i, presetControllers[i][number - 1]);
   }
 }
 
@@ -321,13 +322,17 @@ function noteOff(noteNumber) {
 &nbsp;
 
 <table>
-<tr><td><input type="button" value="Preset FM"   onclick="preset(0)"></td>
-    <td><input type="button" value="Preset AM"   onclick="preset(1)"></td>
-    <td><input type="button" value="Preset XOR"  onclick="preset(2)"></td>
-<!--<td><input type="button" value="Reserved 3"  onclick="preset(3)"></td>-->
-<!--<td><input type="button" value="Reserved 4"  onclick="preset(4)"></td>-->
+<tr><td><input type="button" value="FM"       onclick="preset(1)"         ></td>
+    <td><input type="button" value="(RSVD)"   onclick="preset(2)" disabled></td>
+    <td><input type="button" value="SAW+XOR"  onclick="preset(3)"         ></td>
     <td>&nbsp;</td>
-    <td><input type="button" value="Random"      onclick="setRandom()"></td></tr>
+    <td><input type="button" value="(RSVD)"   onclick="preset(4)" disabled></td>
+    <td><input type="button" value="PWM+SAW"  onclick="preset(5)"         ></td>
+    <td><input type="button" value="(RSVD)"   onclick="preset(6)" disabled></td>
+    <td>&nbsp;</td>
+    <td><input type="button" value="SYNC+FM"  onclick="preset(7)"         ></td>
+    <td><input type="button" value="(RSVD)"   onclick="preset(8)" disabled></td>
+    <td><input type="button" value="RING+PWM" onclick="preset(9)"         ></td></tr>
 </table>
 
 <table>
@@ -335,35 +340,43 @@ function noteOff(noteNumber) {
     <td><input type="button" value="Load #1" onclick="loadControllers(1)"></td>
     <td><input type="button" value="Load #2" onclick="loadControllers(2)"></td>
     <td><input type="button" value="Load #3" onclick="loadControllers(3)"></td>
-    <td><input type="button" value="Load #4" onclick="loadControllers(4)"></td>
     <td>&nbsp;</td>
     <td><input type="button" value="Save #0" onclick="saveControllers(0)"></td>
     <td><input type="button" value="Save #1" onclick="saveControllers(1)"></td>
     <td><input type="button" value="Save #2" onclick="saveControllers(2)"></td>
     <td><input type="button" value="Save #3" onclick="saveControllers(3)"></td>
-    <td><input type="button" value="Save #4" onclick="saveControllers(4)"></td></tr>
+    <td>&nbsp;</td>
+    <td><input type="button" value="Random"  onclick="setRandom()"       ></td></tr>
 </table>
 
 &nbsp;
 
 <table>
-<tr><td>OSC MODE  </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>OSC COLOR </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>MOD RATE  </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>MOD DEPTH </td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td></tr>
-<tr><td><input id="inputCC16" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(16, value)"></td><td><span id="spanCC16">-1</span></td>
-    <td><input id="inputCC17" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(17, value)"></td><td><span id="spanCC17">-1</span></td>
-    <td><input id="inputCC18" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(18, value)"></td><td><span id="spanCC18">-1</span></td>
-    <td><input id="inputCC19" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(19, value)"></td><td><span id="spanCC19">-1</span></td></tr>
-<tr><td>&nbsp;    </td><td></td></tr>
+<tr><td>OSC MODE  </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>OSC COLOR </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>MOD RATE  </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>MOD DEPTH </td></tr>
+<tr><td><input id="inputCC16" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(16, value)"></td><td></td>
+    <td><input id="inputCC17" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(17, value)"></td><td></td>
+    <td><input id="inputCC18" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(18, value)"></td><td></td>
+    <td><input id="inputCC19" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(19, value)"></td></tr>
+<tr><td><span id="spanCC16">-1</span></td><td>&nbsp;</td>
+    <td><span id="spanCC17">-1</span></td><td>&nbsp;</td>
+    <td><span id="spanCC18">-1</span></td><td>&nbsp;</td>
+    <td><span id="spanCC19">-1</span></td></tr>
+<tr><td>&nbsp;</td></tr>
 <tr><td>LPF CUTOFF</td><td></td>
     <td>LPF RESO  </td><td></td>
     <td>ENV A     </td><td></td>
-    <td>ENV D     </td><td></td></tr>
-<tr><td><input id="inputCC20" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(20, value)"></td><td><span id="spanCC20">-1</span></td>
-    <td><input id="inputCC21" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(21, value)"></td><td><span id="spanCC21">-1</span></td>
-    <td><input id="inputCC22" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(22, value)"></td><td><span id="spanCC22">-1</span></td>
-    <td><input id="inputCC23" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(23, value)"></td><td><span id="spanCC23">-1</span></td></tr>
+    <td>ENV D     </td></tr>
+<tr><td><input id="inputCC20" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(20, value)"></td><td></td>
+    <td><input id="inputCC21" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(21, value)"></td><td></td>
+    <td><input id="inputCC22" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(22, value)"></td><td></td>
+    <td><input id="inputCC23" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(23, value)"></td></tr>
+<tr><td><span id="spanCC20">-1</span></td><td></td>
+    <td><span id="spanCC21">-1</span></td><td></td>
+    <td><span id="spanCC22">-1</span></td><td></td>
+    <td><span id="spanCC23">-1</span></td></tr>
 </table>
 
 &nbsp;
