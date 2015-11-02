@@ -15,24 +15,20 @@ public:
     pinMode(LED_PIN,     OUTPUT);
 
     // Timer/Counter0 (8-bit Fast PWM, Inverting, 62500 Hz)
-    TCCR0A = 0xC3;
+    TCCR0A = 0x83;
     TCCR0B = 0x01;
     OCR0A  = 0x80;
-
-    // Timer/Counter1 (10-bit Fast PWM, 15625 Hz)
-    TCCR1A = 0x03;
-    TCCR1B = 0x09;
   }
 
   INLINE static void write(int8_t level) {
-    if (TIFR1 & _BV(TOV1)) {
+    if (TIFR0 & _BV(TOV0)) {
       // overload
       PORTB |= _BV(5);
     } else {
       PORTB &= ~_BV(5);
     }
-    while ((TIFR1 & _BV(TOV1)) == 0);
-    TIFR1 = _BV(TOV1);
+    while ((TIFR0 & _BV(TOV0)) == 0);
+    TIFR1 = _BV(TOV0);
     OCR0A = 0x80 - level;
   }
 };
