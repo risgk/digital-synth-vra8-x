@@ -9,7 +9,7 @@ class Osc {
    static const uint8_t* m_wave_table;
    static uint16_t       m_phase;
    static uint8_t        m_mix;
-   static uint8_t        m_mix_eg_amt;
+   static uint8_t        m_mix_env_amt;
    static uint16_t       m_pulse_width;
    static uint16_t       m_saw_shift;
    static uint8_t        m_color_lfo_amt;
@@ -19,7 +19,7 @@ public:
     m_wave_table = NULL;
     m_phase = 0;
     set_mix(0);
-    set_mix_eg_amt(0);
+    set_mix_env_amt(0);
     set_pulse_width(0);
     set_saw_shift(0);
     set_color_lfo_amt(0);
@@ -29,8 +29,8 @@ public:
     m_mix = controller_value;
   }
 
-  INLINE static void set_mix_eg_amt(uint8_t controller_value) {
-    m_mix_eg_amt = controller_value;
+  INLINE static void set_mix_env_amt(uint8_t controller_value) {
+    m_mix_env_amt = controller_value;
   }
 
   INLINE static void set_pulse_width(uint8_t controller_value) {
@@ -45,7 +45,7 @@ public:
     m_color_lfo_amt = controller_value << 1;
   }
 
-  INLINE static int16_t clock(uint16_t pitch_control, uint8_t mod_eg_control,
+  INLINE static int16_t clock(uint16_t pitch_control, uint8_t mod_env_control,
                                                       int8_t mod_lfo_control) {
     uint8_t coarse_pitch = high_byte(pitch_control);
     uint8_t fine_pitch = low_byte(pitch_control);
@@ -61,7 +61,7 @@ public:
     int8_t saw_up        = -high_byte(m_phase + m_pulse_width - shift_lfo);
     int8_t saw_down_copy = +high_byte(m_phase + m_saw_shift   + shift_lfo);
 
-    uint8_t mix = m_mix + high_byte(m_mix_eg_amt * mod_eg_control);
+    uint8_t mix = m_mix + high_byte(m_mix_env_amt * mod_env_control);
     if (mix > 127) {
       mix = 127;
     }
@@ -79,7 +79,7 @@ private:
 template <uint8_t T> const uint8_t* Osc<T>::m_wave_table;
 template <uint8_t T> uint16_t       Osc<T>::m_phase;
 template <uint8_t T> uint8_t        Osc<T>::m_mix;
-template <uint8_t T> uint8_t        Osc<T>::m_mix_eg_amt;
+template <uint8_t T> uint8_t        Osc<T>::m_mix_env_amt;
 template <uint8_t T> uint16_t       Osc<T>::m_pulse_width;
 template <uint8_t T> uint16_t       Osc<T>::m_saw_shift;
 template <uint8_t T> uint8_t        Osc<T>::m_color_lfo_amt;

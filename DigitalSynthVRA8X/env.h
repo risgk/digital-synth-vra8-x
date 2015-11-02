@@ -2,10 +2,10 @@
 
 #include "common.h"
 #include "mul-q.h"
-#include "eg-table.h"
+#include "env-table.h"
 
 template <uint8_t T>
-class EG {
+class Env {
   static const uint8_t  STATE_ATTACK        = 0;
   static const uint8_t  STATE_DECAY_SUSTAIN = 1;
   static const uint8_t  STATE_RELEASE       = 2;
@@ -15,7 +15,7 @@ class EG {
   static uint16_t m_count;
   static uint16_t m_level;
   static uint16_t m_attack_rate;
-  static uint8_t  m_eg_decay_release_rate;
+  static uint8_t  m_env_decay_release_rate;
   static uint16_t m_decay_release_update_interval;
   static uint16_t m_sustain_level;
 
@@ -31,13 +31,13 @@ public:
 
   INLINE static void set_attack(uint8_t controller_value) {
     m_attack_rate =
-      g_eg_attack_rate_table[controller_value >> (7 - EG_CONTROLLER_STEPS_BITS)];
+      g_env_attack_rate_table[controller_value >> (7 - ENV_CONTROLLER_STEPS_BITS)];
   }
 
   INLINE static void set_decay_release(uint8_t controller_value) {
-    uint8_t time = controller_value >> (7 - EG_CONTROLLER_STEPS_BITS);
-    m_eg_decay_release_rate         = g_eg_decay_release_rate_table[time];
-    m_decay_release_update_interval = g_eg_decay_release_update_interval_table[time];
+    uint8_t time = controller_value >> (7 - ENV_CONTROLLER_STEPS_BITS);
+    m_env_decay_release_rate         = g_env_decay_release_rate_table[time];
+    m_decay_release_update_interval = g_env_decay_release_update_interval_table[time];
   }
 
   INLINE static void set_sustain(uint8_t controller_value) {
@@ -47,9 +47,9 @@ public:
   INLINE static void note_on() {
 #if 0
     m_state = STATE_ATTACK;
-    m_count = EG_ATTACK_UPDATE_INTERVAL;
+    m_count = ENV_ATTACK_UPDATE_INTERVAL;
 #else
-    m_level = EG_LEVEL_MAX;
+    m_level = ENV_LEVEL_MAX;
 #endif
   }
 
@@ -68,10 +68,10 @@ public:
     case STATE_ATTACK:
       m_count--;
       if (m_count == 0) {
-        m_count = EG_ATTACK_UPDATE_INTERVAL;
-        if (m_level >= EG_LEVEL_MAX - m_attack_rate) {
+        m_count = ENV_ATTACK_UPDATE_INTERVAL;
+        if (m_level >= ENV_LEVEL_MAX - m_attack_rate) {
           m_state = STATE_DECAY_SUSTAIN;
-          m_level = EG_LEVEL_MAX;
+          m_level = ENV_LEVEL_MAX;
         } else {
           m_level += m_attack_rate;
         }
@@ -82,11 +82,11 @@ public:
       if (m_count == 0) {
         m_count = m_decay_release_update_interval;
         if (m_level > m_sustain_level) {
-          if (m_level <= m_sustain_level + (EG_LEVEL_MAX >> 10)) {
+          if (m_level <= m_sustain_level + (ENV_LEVEL_MAX >> 10)) {
             m_level = m_sustain_level;
           } else {
             m_level = m_sustain_level +
-                      mul_q16_q8(m_level - m_sustain_level, m_eg_decay_release_rate);
+                      mul_q16_q8(m_level - m_sustain_level, m_env_decay_release_rate);
           }
         }
       }
@@ -95,11 +95,11 @@ public:
       m_count--;
       if (m_count == 0) {
         m_count = m_decay_release_update_interval;
-        if (m_level <= (EG_LEVEL_MAX >> 10)) {
+        if (m_level <= (ENV_LEVEL_MAX >> 10)) {
           m_state = STATE_IDLE;
           m_level = 0;
         } else {
-          m_level = mul_q16_q8(m_level, m_eg_decay_release_rate);
+          m_level = mul_q16_q8(m_level, m_env_decay_release_rate);
         }
       }
       break;
@@ -112,10 +112,10 @@ public:
   }
 };
 
-template <uint8_t T> uint8_t  EG<T>::m_state;
-template <uint8_t T> uint16_t EG<T>::m_count;
-template <uint8_t T> uint16_t EG<T>::m_level;
-template <uint8_t T> uint16_t EG<T>::m_attack_rate;
-template <uint8_t T> uint8_t  EG<T>::m_eg_decay_release_rate;
-template <uint8_t T> uint16_t EG<T>::m_decay_release_update_interval;
-template <uint8_t T> uint16_t EG<T>::m_sustain_level;
+template <uint8_t T> uint8_t  Env<T>::m_state;
+template <uint8_t T> uint16_t Env<T>::m_count;
+template <uint8_t T> uint16_t Env<T>::m_level;
+template <uint8_t T> uint16_t Env<T>::m_attack_rate;
+template <uint8_t T> uint8_t  Env<T>::m_env_decay_release_rate;
+template <uint8_t T> uint16_t Env<T>::m_decay_release_update_interval;
+template <uint8_t T> uint16_t Env<T>::m_sustain_level;

@@ -6,14 +6,16 @@
 
 // associations of units
 #define IOsc             Osc
+#define IFilter          Filter
 #define IAmp             Amp
-#define IEG              EG
+#define IEnv             Env
 #define IVoice           Voice
 #define ISynthCore       SynthCore
 
 #include "osc.h"
+#include "filter.h"
 #include "amp.h"
-#include "eg.h"
+#include "env.h"
 #include "voice.h"
 #include "synth-core.h"
 
