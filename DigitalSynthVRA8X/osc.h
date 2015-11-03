@@ -8,8 +8,10 @@ template <uint8_t T>
 class Osc {
   friend class OscModePulseSaw;
 
-  static uint16_t m_lfo_phase;
-  static uint16_t m_phase;
+  static uint16_t m_phase_0;  // LFO or MOD Signal
+  static uint16_t m_phase_1;
+  static uint16_t m_phase_2;
+  static uint16_t m_phase_3;
 
   static uint8_t  m_mode;
   static uint8_t  m_color;
@@ -18,8 +20,11 @@ class Osc {
 
 public:
   INLINE static void initialize() {
-    m_lfo_phase = 0x4000;
-    m_phase = 0;
+    m_phase_0 = 0;
+    m_phase_1 = 0;
+    m_phase_2 = 0;
+    m_phase_3 = 0;
+    m_mode = 0;
     set_mode(0);
     set_color(0);
     set_mod_rate(0);
@@ -27,9 +32,14 @@ public:
   }
 
   INLINE static void set_mode(uint8_t controller_value) {
-    m_mode = (static_cast<uint8_t>(controller_value + 8) >> 4) + 1;
-
-    // TODO: reset
+    uint8_t mode = (static_cast<uint8_t>(controller_value + 8) >> 4) + 1;
+    if (m_mode != mode) {
+      m_mode = mode;
+      m_phase_0 = 0;
+      m_phase_1 = 0;
+      m_phase_2 = 0;
+      m_phase_3 = 0;
+    }
   }
 
   INLINE static void set_color(uint8_t controller_value) {
@@ -50,7 +60,18 @@ public:
     switch (m_mode) {
     case OSC_MODE_1_FM:
       {
-        // TODO
+        const uint8_t* wave_table = g_osc_tri_wave_tables[pitch_control - NOTE_NUMBER_MIN];
+        uint16_t freq = g_osc_freq_table[pitch_control - NOTE_NUMBER_MIN];
+        m_phase_1 += freq;
+        m_phase_2 += freq + (m_color + 1);
+        m_phase_3 += freq - (m_color + 1);
+
+        int8_t wave_1 = +get_wave_level(wave_table, m_phase_1);
+        int8_t wave_2 = -get_wave_level(wave_table, m_phase_2);
+        int8_t wave_3 = -get_wave_level(wave_table, m_phase_3);
+
+        int16_t mixed = wave_1 * 80 + wave_2 * 80 + wave_3 * 80;
+        result = mixed >> 1;
       }
       break;
     case OSC_MODE_3_SAW_XOR:
@@ -62,22 +83,18 @@ public:
       {
         int8_t mod_lfo_control = lfo_clock(mod_eg_control);
 
-        const uint8_t* wave_table = g_osc_tri_wave_tables[pitch_control - NOTE_NUMBER_MIN];
+        const uint8_t* wave_table = g_osc_saw_wave_tables[pitch_control - NOTE_NUMBER_MIN];
         uint16_t freq = g_osc_freq_table[pitch_control - NOTE_NUMBER_MIN];
-        m_phase += freq;
+        m_phase_1 += freq;
 
         uint16_t shift_lfo = (mod_lfo_control * (m_mod_depth << 1));
-        int8_t saw_down      = +get_saw_wave_level(wave_table, m_phase);
-        int8_t saw_up        = -get_saw_wave_level(wave_table, m_phase - shift_lfo);
-        int8_t saw_down_copy = +get_saw_wave_level(wave_table, m_phase + shift_lfo);
+        int8_t saw_down      = +get_wave_level(wave_table, m_phase_1);
+        int8_t saw_up        = -get_wave_level(wave_table, m_phase_1 + (128 << 8) - shift_lfo);
+        int8_t saw_down_copy = +get_wave_level(wave_table, m_phase_1              + shift_lfo);
 
-        uint8_t mix = m_color;
-        if (mix > 127) {
-          mix = 127;
-        }
         int16_t mixed = saw_down      * 127 +
-                        saw_up        * static_cast<uint8_t>(127 - mix) +
-                        saw_down_copy * mix;
+                        saw_up        * static_cast<uint8_t>(127 - m_color) +
+                        saw_down_copy * m_color;
         result = mixed >> 1;
       }
       break;
@@ -103,9 +120,9 @@ private:
       rate = 127;
     }
     rate = (rate >> 1) + 2;
-    m_lfo_phase += rate;
+    m_phase_0 += rate;
 
-    uint16_t level = m_lfo_phase;
+    uint16_t level = m_phase_0;
     if ((level & 0x8000) != 0) {
       level = ~level;
     }
@@ -113,7 +130,7 @@ private:
     return high_sbyte(high_sbyte(level << 1) * mod_eg_control);
   }
 
-  INLINE static int8_t get_saw_wave_level(const uint8_t* wave_table, uint16_t phase) {
+  INLINE static int8_t get_wave_level(const uint8_t* wave_table, uint16_t phase) {
     uint8_t curr_index = high_byte(phase);
     uint16_t tmp = pgm_read_word(wave_table + curr_index);
     int8_t curr_data = low_byte(tmp);
@@ -127,8 +144,10 @@ private:
   }
 };
 
-template <uint8_t T> uint16_t Osc<T>::m_lfo_phase;
-template <uint8_t T> uint16_t Osc<T>::m_phase;
+template <uint8_t T> uint16_t Osc<T>::m_phase_0;
+template <uint8_t T> uint16_t Osc<T>::m_phase_1;
+template <uint8_t T> uint16_t Osc<T>::m_phase_2;
+template <uint8_t T> uint16_t Osc<T>::m_phase_3;
 template <uint8_t T> uint8_t  Osc<T>::m_mode;
 template <uint8_t T> uint8_t  Osc<T>::m_color;
 template <uint8_t T> uint16_t Osc<T>::m_mod_rate;
