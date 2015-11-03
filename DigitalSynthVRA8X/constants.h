@@ -8,8 +8,6 @@ const uint8_t   BIT_DEPTH       = 8;
 const uint8_t   NOTE_NUMBER_MIN = 24;
 const uint8_t   NOTE_NUMBER_MAX = 84;
 
-const uint8_t   OSC_TUNE_RATE_TABLE_STEPS_BITS         = 6;
-const uint8_t   OSC_TUNE_RATE_DENOMINATOR_BITS         = 16;
 const uint8_t   OSC_PHASE_RESOLUTION_BITS              = 16;
 const uint8_t   OSC_WAVE_TABLE_AMPLITUDE               = 96;
 const uint8_t   OSC_WAVE_TABLE_SAMPLES_BITS            = 8;

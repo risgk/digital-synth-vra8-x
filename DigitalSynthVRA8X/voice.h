@@ -57,7 +57,7 @@ public:
   INLINE static int8_t clock() {
     uint8_t eg_output     = IEG<0>::clock();
     int8_t  lfo_output    = ILFO<0>::clock(eg_output);
-    int16_t osc_output    = IOsc<0>::clock(m_note_number << 8, eg_output, lfo_output);
+    int16_t osc_output    = IOsc<0>::clock(m_note_number, eg_output, lfo_output);
     int16_t filter_output = IFilter<0>::clock(osc_output, eg_output);
     int16_t amp_output    = IAmp<0>::clock(filter_output, eg_output);
     return high_sbyte(amp_output);
