@@ -9,7 +9,6 @@
 #define IFilter     Filter
 #define IAmp        Amp
 #define IEG         EG
-#define ILFO        LFO
 #define IVoice      Voice
 #define ISynthCore  SynthCore
 
@@ -17,7 +16,6 @@
 #include "filter.h"
 #include "amp.h"
 #include "eg.h"
-#include "lfo.h"
 #include "voice.h"
 #include "synth-core.h"
 

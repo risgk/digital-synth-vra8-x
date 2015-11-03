@@ -6,16 +6,19 @@
 
 template <uint8_t T>
 class Osc {
-   friend class OscModePulseSaw;
+  friend class OscModePulseSaw;
 
-   static uint16_t       m_phase;
-   static uint8_t        m_mode;
-   static uint8_t        m_color;
-   static uint16_t       m_mod_rate;
-   static uint16_t       m_mod_depth;
+  static uint16_t m_lfo_phase;
+  static uint16_t m_phase;
+
+  static uint8_t  m_mode;
+  static uint8_t  m_color;
+  static uint16_t m_mod_rate;
+  static uint16_t m_mod_depth;
 
 public:
   INLINE static void initialize() {
+    m_lfo_phase = 0x4000;
     m_phase = 0;
     set_mode(0);
     set_color(0);
@@ -41,8 +44,7 @@ public:
     m_mod_depth = controller_value;
   }
 
-  INLINE static int16_t clock(uint8_t pitch_control, uint8_t mod_eg_control,
-                                                     int8_t mod_lfo_control) {
+  INLINE static int16_t clock(uint8_t pitch_control, uint8_t mod_eg_control) {
     int16_t result = 0;
 
     switch (m_mode) {
@@ -58,6 +60,8 @@ public:
       break;
     case OSC_MODE_5_PWM_SAW:
       {
+        int8_t mod_lfo_control = lfo_clock(mod_eg_control);
+
         const uint8_t* wave_table = g_osc_tri_wave_tables[pitch_control - NOTE_NUMBER_MIN];
         uint16_t freq = g_osc_freq_table[pitch_control - NOTE_NUMBER_MIN];
         m_phase += freq;
@@ -93,6 +97,22 @@ public:
   }
 
 private:
+  INLINE static int8_t lfo_clock(uint8_t mod_eg_control) {
+    uint8_t rate = m_mod_rate;
+    if (rate > 127) {
+      rate = 127;
+    }
+    rate = (rate >> 1) + 2;
+    m_lfo_phase += rate;
+
+    uint16_t level = m_lfo_phase;
+    if ((level & 0x8000) != 0) {
+      level = ~level;
+    }
+    level -= 0x4000;
+    return high_sbyte(high_sbyte(level << 1) * mod_eg_control);
+  }
+
   INLINE static int8_t get_saw_wave_level(const uint8_t* wave_table, uint16_t phase) {
     uint8_t curr_index = high_byte(phase);
     uint16_t tmp = pgm_read_word(wave_table + curr_index);
@@ -107,9 +127,9 @@ private:
   }
 };
 
-
-template <uint8_t T> uint16_t       Osc<T>::m_phase;
-template <uint8_t T> uint8_t        Osc<T>::m_mode;
-template <uint8_t T> uint8_t        Osc<T>::m_color;
-template <uint8_t T> uint16_t       Osc<T>::m_mod_rate;
-template <uint8_t T> uint16_t       Osc<T>::m_mod_depth;
+template <uint8_t T> uint16_t Osc<T>::m_lfo_phase;
+template <uint8_t T> uint16_t Osc<T>::m_phase;
+template <uint8_t T> uint8_t  Osc<T>::m_mode;
+template <uint8_t T> uint8_t  Osc<T>::m_color;
+template <uint8_t T> uint16_t Osc<T>::m_mod_rate;
+template <uint8_t T> uint16_t Osc<T>::m_mod_depth;
