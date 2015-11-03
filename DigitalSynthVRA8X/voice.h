@@ -28,28 +28,28 @@ public:
   INLINE static void control_change(uint8_t controller_number, uint8_t controller_value) {
     switch (controller_number) {
     case OSC_MODE:
-      // TODO
+      IOsc<0>::set_mode(controller_value);
       break;
     case OSC_COLOR:
-      // TODO
+      IOsc<0>::set_color(controller_value);
       break;
     case MOD_RATE:
-      // TODO
+      IOsc<0>::set_mod_rate(controller_value);
       break;
     case MOD_DEPTH:
-      // TODO
+      IOsc<0>::set_mod_depth(controller_value);
       break;
     case LPF_CUTOFF:
-      // TODO
+      IFilter<0>::set_cutoff(controller_value);
       break;
     case LPF_RESONANCE:
-      // TODO
+      IFilter<0>::set_resonance(controller_value);
       break;
     case ENV_A:
       IEG<0>::set_attack(controller_value);
       break;
     case ENV_D:
-      IEG<0>::set_decay_release(controller_value);
+      IEG<0>::set_decay(controller_value);
       break;
     }
   }

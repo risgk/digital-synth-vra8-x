@@ -42,3 +42,9 @@ const uint8_t   LPF_RESONANCE = 21;
 const uint8_t   ENV_A         = 22;
 const uint8_t   ENV_D         = 23;
 const uint8_t   ALL_NOTES_OFF = 123;
+
+const uint8_t   OSC_MODE_1_FM       = 1;
+const uint8_t   OSC_MODE_3_SAW_XOR  = 3;
+const uint8_t   OSC_MODE_5_PWM_SAW  = 5;
+const uint8_t   OSC_MODE_7_SYNC_FM  = 7;
+const uint8_t   OSC_MODE_9_RING_PWM = 9;

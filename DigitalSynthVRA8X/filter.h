@@ -26,11 +26,11 @@ public:
     m_y_2 = 0;
     set_cutoff(127);
     set_resonance(0);
-    set_cutoff_eg_amt(0);
   }
 
   INLINE static void set_cutoff(uint8_t controller_value) {
-    m_cutoff = controller_value;
+    m_cutoff = controller_value >> 1;
+    m_cutoff_eg_amt = controller_value >> 1;
   }
 
   INLINE static void set_resonance(uint8_t controller_value) {
@@ -41,10 +41,6 @@ public:
     } else {
       m_lpf_table = g_filter_lpf_table_q_1_over_sqrt_2;
     }
-  }
-
-  INLINE static void set_cutoff_eg_amt(uint8_t controller_value) {
-    m_cutoff_eg_amt = controller_value;
   }
 
   INLINE static int16_t clock(int16_t audio_input, uint8_t cutoff_eg_control) {

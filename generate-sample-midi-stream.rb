@@ -38,7 +38,7 @@ end
 sound_off
 
 # Preset Lead
-control_change(OSC_MODE     , 0  )
+control_change(OSC_MODE     , 64 )
 control_change(OSC_COLOR    , 64 )
 control_change(MOD_RATE     , 8  )
 control_change(MOD_DEPTH    , 64 )
