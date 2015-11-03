@@ -5,21 +5,19 @@
 #include "common.h"
 
 // associations of units
-#define IVCO             VCO
-#define IVCF             VCF
-#define IVCA             VCA
-#define IEG              EG
-#define ILFO             LFO
-#define ISlewRateLimiter SlewRateLimiter
-#define IVoice           Voice
-#define ISynthCore       SynthCore
+#define IOsc        Osc
+#define IFilter     Filter
+#define IAmp        Amp
+#define IEG         EG
+#define ILFO        LFO
+#define IVoice      Voice
+#define ISynthCore  SynthCore
 
-#include "vco.h"
-#include "vcf.h"
-#include "vca.h"
+#include "osc.h"
+#include "filter.h"
+#include "amp.h"
 #include "eg.h"
 #include "lfo.h"
-#include "slew-rate-limiter.h"
 #include "voice.h"
 #include "synth-core.h"
 
@@ -28,6 +26,14 @@ class Synth {
 public:
   INLINE static void initialize() {
     ISynthCore<0>::initialize();
+    ISynthCore<0>::control_change(OSC_MODE     , 0  );
+    ISynthCore<0>::control_change(OSC_COLOR    , 64 );
+    ISynthCore<0>::control_change(MOD_RATE     , 8  );
+    ISynthCore<0>::control_change(MOD_DEPTH    , 64 );
+    ISynthCore<0>::control_change(LPF_CUTOFF   , 127);
+    ISynthCore<0>::control_change(LPF_RESONANCE, 0  );
+    ISynthCore<0>::control_change(ENV_A        , 64 );
+    ISynthCore<0>::control_change(ENV_D        , 64 );
   }
 
   INLINE static void receive_midi_byte(uint8_t b) {

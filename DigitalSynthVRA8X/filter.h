@@ -4,10 +4,10 @@
 
 #include "common.h"
 #include "mul-q.h"
-#include "vcf-table.h"
+#include "filter-table.h"
 
 template <uint8_t T>
-class VCF {
+class Filter {
   static int16_t        m_x_1;
   static int16_t        m_x_2;
   static int16_t        m_y_1;
@@ -35,11 +35,11 @@ public:
 
   INLINE static void set_resonance(uint8_t controller_value) {
     if (controller_value >= 96) {
-      m_lpf_table = g_vcf_lpf_table_q_4_sqrt_2;
+      m_lpf_table = g_filter_lpf_table_q_4_sqrt_2;
     } else if (controller_value >= 32) {
-      m_lpf_table = g_vcf_lpf_table_q_2;
+      m_lpf_table = g_filter_lpf_table_q_2;
     } else {
-      m_lpf_table = g_vcf_lpf_table_q_1_over_sqrt_2;
+      m_lpf_table = g_filter_lpf_table_q_1_over_sqrt_2;
     }
   }
 
@@ -59,13 +59,13 @@ public:
     int8_t  a_1_over_a_0_high = *p;
     int16_t b_2_over_a_0      = b_2_over_a_0_low | (b_2_over_a_0_high << 8);
     int16_t a_2_over_a_0      = (b_2_over_a_0 << 2) - (a_1_over_a_0_high << 8) -
-                                                      (1 << VCF_TABLE_FRACTION_BITS);
+                                                      (1 << FILTER_TABLE_FRACTION_BITS);
 
     int16_t x_0  = audio_input >> (16 - AUDIO_FRACTION_BITS);
     int16_t tmp  = mul_q15_q15(x_0 + (m_x_1 << 1) + m_x_2, b_2_over_a_0);
     tmp         -= mul_q15_q7( m_y_1,                      a_1_over_a_0_high);
     tmp         -= mul_q15_q15(m_y_2,                      a_2_over_a_0);
-    int16_t y_0  = tmp << (16 - VCF_TABLE_FRACTION_BITS);
+    int16_t y_0  = tmp << (16 - FILTER_TABLE_FRACTION_BITS);
 
     if (y_0 > ((1 << (AUDIO_FRACTION_BITS - 1)) - 1)) {
       y_0 = ((1 << (AUDIO_FRACTION_BITS - 1)) - 1);
@@ -83,10 +83,10 @@ public:
   }
 };
 
-template <uint8_t T> int16_t        VCF<T>::m_x_1;
-template <uint8_t T> int16_t        VCF<T>::m_x_2;
-template <uint8_t T> int16_t        VCF<T>::m_y_1;
-template <uint8_t T> int16_t        VCF<T>::m_y_2;
-template <uint8_t T> uint16_t       VCF<T>::m_cutoff;
-template <uint8_t T> const uint8_t* VCF<T>::m_lpf_table;
-template <uint8_t T> uint8_t        VCF<T>::m_cutoff_eg_amt;
+template <uint8_t T> int16_t        Filter<T>::m_x_1;
+template <uint8_t T> int16_t        Filter<T>::m_x_2;
+template <uint8_t T> int16_t        Filter<T>::m_y_1;
+template <uint8_t T> int16_t        Filter<T>::m_y_2;
+template <uint8_t T> uint16_t       Filter<T>::m_cutoff;
+template <uint8_t T> const uint8_t* Filter<T>::m_lpf_table;
+template <uint8_t T> uint8_t        Filter<T>::m_cutoff_eg_amt;

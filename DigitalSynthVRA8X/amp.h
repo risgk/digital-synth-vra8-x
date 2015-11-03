@@ -3,7 +3,7 @@
 #include "common.h"
 
 template <uint8_t T>
-class VCA {
+class Amp {
   static uint8_t m_gain;
 
 public:
@@ -21,4 +21,4 @@ public:
   }
 };
 
-template <uint8_t T> uint8_t VCA<T>::m_gain;
+template <uint8_t T> uint8_t Amp<T>::m_gain;
