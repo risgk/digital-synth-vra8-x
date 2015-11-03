@@ -23,10 +23,10 @@ def generate_filter_lpf_table(name, q)
     b_2_over_a_0 = ((b_2 / a_0) * 4 * (1 << FILTER_TABLE_FRACTION_BITS)).floor.to_i
     b_2_over_a_0_low = b_2_over_a_0 & 0xFF
     b_2_over_a_0_high = b_2_over_a_0 >> 8
-    a_1_over_a_0 = ((a_1 / a_0) * (1 << FILTER_TABLE_FRACTION_BITS)).floor.to_i
+    a_1_over_a_0 = (-(a_1 / a_0) * (1 << FILTER_TABLE_FRACTION_BITS)).floor.to_i
     a_1_over_a_0_high = a_1_over_a_0 >> 8
 
-    $file.printf("%+4d, %+4d, %+4d,", b_2_over_a_0_low, b_2_over_a_0_high, a_1_over_a_0_high)
+    $file.printf("%3d, %3d, %3d,", b_2_over_a_0_low, b_2_over_a_0_high, a_1_over_a_0_high)
     if i == DATA_BYTE_MAX
       $file.printf("\n")
     elsif i % 4 == 3

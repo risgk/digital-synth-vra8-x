@@ -46,24 +46,23 @@ public:
     }
 
     const uint8_t* p = m_lpf_table + (cutoff * 3);
-    uint8_t b_2_over_a_0_low  = *p++;
-    int8_t  b_2_over_a_0_high = *p++;
-    int8_t  a_1_over_a_0_high = *p;
-    int16_t b_2_over_a_0      = b_2_over_a_0_low | (b_2_over_a_0_high << 8);
-    int8_t  a_2_over_a_0_high = b_2_over_a_0_high - a_1_over_a_0_high - 64;
+    uint8_t  b_2_over_a_0_low  = *p++;
+    uint8_t  b_2_over_a_0_high = *p++;
+    uint8_t  a_1_over_a_0_high = *p;
+    uint16_t b_2_over_a_0      = b_2_over_a_0_low | (b_2_over_a_0_high << 8);
+    uint8_t  a_2_over_a_0_high = b_2_over_a_0_high + a_1_over_a_0_high - 128;
 
     int8_t x_0   = high_byte(audio_input);
-    int16_t tmp  = mul_q15_q7(b_2_over_a_0, x_0);
-    tmp         -= m_y_1 * a_1_over_a_0_high;
+    int16_t tmp  = mul_q16_q7(b_2_over_a_0, x_0);
+    tmp         += m_y_1 * a_1_over_a_0_high;
     tmp         -= m_y_2 * a_2_over_a_0_high;
-    int8_t y_0   = (tmp << 2) >> 8;
-
-    if (y_0 > 127) {
-      y_0 = 127;
+    if (tmp > 127*256) {
+      tmp = 127*256;
     }
-    if (y_0 < -128) {
-      y_0 = -128;
+    if (tmp < -128*256) {
+      tmp = -128*256;
     }
+    int8_t y_0 = (tmp << 1) >> 8;
 
     m_y_2 = m_y_1;
     m_y_1 = y_0;
