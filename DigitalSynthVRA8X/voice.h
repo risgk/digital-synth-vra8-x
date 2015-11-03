@@ -7,6 +7,7 @@ class Voice {
 public:
   INLINE static void initialize() {
     IOsc<0>::initialize();
+    IFilter<0>::initialize();
     IAmp<0>::initialize();
     IEnv<0>::initialize();
     m_note_number = NOTE_NUMBER_MIN;
@@ -38,16 +39,17 @@ public:
       // TODO
       break;
     case LPF_CUTOFF:
-      IEnv<0>::set_attack(controller_value);
+      IFilter<0>::set_cutoff(controller_value);
       break;
     case LPF_RESONANCE:
-      IEnv<0>::set_decay_release(controller_value);
+      IFilter<0>::set_resonance(controller_value);
       break;
     case ENV_A:
-      IEnv<0>::set_sustain(controller_value);
+      IEnv<0>::set_attack(controller_value);
       break;
     case ENV_D:
       // TODO
+      IEnv<0>::set_decay_release(controller_value);
       break;
     case ALL_NOTES_OFF:
       IEnv<0>::note_off();
