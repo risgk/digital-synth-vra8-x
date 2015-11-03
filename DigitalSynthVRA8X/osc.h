@@ -62,15 +62,21 @@ public:
       {
         const uint8_t* wave_table = g_osc_tri_wave_tables[pitch_control - NOTE_NUMBER_MIN];
         uint16_t freq = g_osc_freq_table[pitch_control - NOTE_NUMBER_MIN];
+        m_phase_0 += freq;
         m_phase_1 += freq;
         m_phase_2 += freq + (m_color + 1);
         m_phase_3 += freq - (m_color + 1);
 
-        int8_t wave_1 = +get_wave_level(wave_table, m_phase_1);
-        int8_t wave_2 = -get_wave_level(wave_table, m_phase_2);
-        int8_t wave_3 = -get_wave_level(wave_table, m_phase_3);
+        int8_t wave_0 = +get_wave_level(wave_table, m_phase_0);
+        int8_t wave_1 = +get_wave_level(wave_table, m_phase_1 + (wave_0 * (m_mod_depth << 1)));
+        int8_t wave_2 = -get_wave_level(wave_table, m_phase_2 + (wave_0 * (m_mod_depth << 1)));
+        int8_t wave_3 = -get_wave_level(wave_table, m_phase_3 + (wave_0 * (m_mod_depth << 1)));
 
+#if 1
         int16_t mixed = wave_1 * 80 + wave_2 * 80 + wave_3 * 80;
+#else
+        int16_t mixed = wave_1 * 240;
+#endif
         result = mixed >> 1;
       }
       break;
