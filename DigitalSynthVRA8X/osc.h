@@ -35,10 +35,7 @@ public:
     uint8_t mode = (static_cast<uint8_t>(controller_value + 8) >> 4) + 1;
     if (m_mode != mode) {
       m_mode = mode;
-      m_phase_0 = 0;
-      m_phase_1 = 0;
-      m_phase_2 = 0;
-      m_phase_3 = 0;
+      reset_phase();
     }
   }
 
@@ -47,11 +44,23 @@ public:
   }
 
   INLINE static void set_mod_rate(uint8_t controller_value) {
+    switch (m_mode) {
+    case OSC_MODE_1_FM:
+      {
+        uint8_t old_fm_ratio = mod_rate_to_fm_ratio(m_mod_rate);
+        uint8_t new_fm_ratio = mod_rate_to_fm_ratio(controller_value);
+        if (old_fm_ratio != new_fm_ratio) {
+          reset_phase();
+        }
+      }
+      break;
+    }
+
     m_mod_rate = controller_value;
   }
 
   INLINE static void set_mod_depth(uint8_t controller_value) {
-    m_mod_depth = controller_value;
+    m_mod_depth = controller_value << 1;
   }
 
   INLINE static int16_t clock(uint8_t pitch_control, uint8_t mod_eg_control) {
@@ -60,23 +69,19 @@ public:
     switch (m_mode) {
     case OSC_MODE_1_FM:
       {
-        const uint8_t* wave_table = g_osc_tri_wave_tables[pitch_control - NOTE_NUMBER_MIN];
+        const uint8_t* wave_table = g_osc_sin_wave_table_h1;
         uint16_t freq = g_osc_freq_table[pitch_control - NOTE_NUMBER_MIN];
-        m_phase_0 += freq;
+        uint16_t mod_freq = freq * mod_rate_to_fm_ratio(m_mod_rate);
+
+        m_phase_0 += mod_freq;
         m_phase_1 += freq;
-        m_phase_2 += freq + (m_color + 1);
-        m_phase_3 += freq - (m_color + 1);
+        m_phase_2 += freq + 1;
 
         int8_t wave_0 = +get_wave_level(wave_table, m_phase_0);
-        int8_t wave_1 = +get_wave_level(wave_table, m_phase_1 + (wave_0 * (m_mod_depth << 1)));
-        int8_t wave_2 = -get_wave_level(wave_table, m_phase_2 + (wave_0 * (m_mod_depth << 1)));
-        int8_t wave_3 = -get_wave_level(wave_table, m_phase_3 + (wave_0 * (m_mod_depth << 1)));
+        int8_t wave_1 = +get_wave_level(wave_table, m_phase_1 + ((wave_0 * high_byte(m_mod_depth * mod_eg_control)) << 1));
+        int8_t wave_2 = -get_wave_level(wave_table, m_phase_2 + ((wave_0 * high_byte(m_mod_depth * mod_eg_control)) << 1));
 
-#if 1
-        int16_t mixed = wave_1 * 80 + wave_2 * 80 + wave_3 * 80;
-#else
-        int16_t mixed = wave_1 * 240;
-#endif
+        int16_t mixed = (wave_1 * static_cast<uint8_t>(127 - m_color)) + (wave_2 * m_color);
         result = mixed >> 1;
       }
       break;
@@ -87,13 +92,13 @@ public:
       break;
     case OSC_MODE_5_PWM_SAW:
       {
-        int8_t mod_lfo_control = lfo_clock(mod_eg_control);
+        int8_t mod_lfo_control = triangle_lfo_clock(mod_eg_control, m_mod_rate);
 
         const uint8_t* wave_table = g_osc_saw_wave_tables[pitch_control - NOTE_NUMBER_MIN];
         uint16_t freq = g_osc_freq_table[pitch_control - NOTE_NUMBER_MIN];
         m_phase_1 += freq;
 
-        uint16_t shift_lfo = (mod_lfo_control * (m_mod_depth << 1));
+        uint16_t shift_lfo = (mod_lfo_control * m_mod_depth);
         int8_t saw_down      = +get_wave_level(wave_table, m_phase_1);
         int8_t saw_up        = -get_wave_level(wave_table, m_phase_1 + (128 << 8) - shift_lfo);
         int8_t saw_down_copy = +get_wave_level(wave_table, m_phase_1              + shift_lfo);
@@ -120,13 +125,19 @@ public:
   }
 
 private:
-  INLINE static int8_t lfo_clock(uint8_t mod_eg_control) {
-    uint8_t rate = m_mod_rate;
-    if (rate > 127) {
-      rate = 127;
-    }
-    rate = (rate >> 1) + 2;
-    m_phase_0 += rate;
+  INLINE static void reset_phase() {
+    m_phase_0 = 0;
+    m_phase_1 = 0;
+    m_phase_2 = 0;
+    m_phase_3 = 0;
+  }
+
+  INLINE static int8_t mod_rate_to_fm_ratio(uint8_t mod_rate) {
+    return ((m_mod_rate + 8) >> 4) + 1;
+  }
+
+  INLINE static int8_t triangle_lfo_clock(uint8_t mod_eg_control, uint8_t mod_rate) {
+    m_phase_0 += ((mod_rate + 1) >> 1) + 1;
 
     uint16_t level = m_phase_0;
     if ((level & 0x8000) != 0) {

@@ -8,6 +8,8 @@ def freq_from_note_number(note_number)
   cent = (note_number * 100.0) - 6900.0
   hz = 440.0 * (2.0 ** (cent / 1200.0))
   freq = (hz * (1 << OSC_PHASE_RESOLUTION_BITS) / SAMPLING_RATE).floor.to_i
+  freq = freq + 1 if freq.odd?
+  freq
 end
 
 $file.printf("const uint16_t g_osc_freq_table[] = {\n  ")
@@ -37,7 +39,7 @@ def generate_osc_wave_table_sawtooth(last)
       level += (2.0 / Math::PI) * Math.sin((2.0 * Math::PI) * ((n + 0.5) /
                (1 << OSC_WAVE_TABLE_SAMPLES_BITS)) * k) / k
     end
-    level = (level * OSC_WAVE_TABLE_AMPLITUDE).floor.to_i
+    level = (level * OSC_WAVE_TABLE_AMPLITUDE_SAW).floor.to_i
 
     $file.printf("%+4d,", level)
     if n == (1 << OSC_WAVE_TABLE_SAMPLES_BITS)
@@ -51,20 +53,12 @@ def generate_osc_wave_table_sawtooth(last)
   $file.printf("};\n\n")
 end
 
-def generate_osc_wave_table_triangle(last)
-  $file.printf("const uint8_t g_osc_tri_wave_table_h%d[] PROGMEM = {\n  ", last)
+def generate_osc_wave_table_sine(last)
+  $file.printf("const uint8_t g_osc_sin_wave_table_h%d[] PROGMEM = {\n  ", last)
   (0..(1 << OSC_WAVE_TABLE_SAMPLES_BITS)).each do |n|
     level = 0
-    (1..last).each do |k|
-      if k % 4 == 1
-        level += (8.0 / (Math::PI ** 2)) * Math::sin((2.0 * Math::PI) * ((n + 0.5) /
-                 (1 << OSC_WAVE_TABLE_SAMPLES_BITS)) * k) / (k ** 2.0)
-      elsif k % 4 == 3
-        level += (8.0 / (Math::PI ** 2)) * -Math::sin((2.0 * Math::PI) * ((n + 0.5) /
-                 (1 << OSC_WAVE_TABLE_SAMPLES_BITS)) * k) / (k ** 2.0)
-      end
-    end
-    level = (level * OSC_WAVE_TABLE_AMPLITUDE).floor.to_i
+    level += Math::sin((2.0 * Math::PI) * ((n + 0.5) / (1 << OSC_WAVE_TABLE_SAMPLES_BITS)))
+    level = (level * OSC_WAVE_TABLE_AMPLITUDE_SINE).floor.to_i
 
     $file.printf("%+4d,", level)
     if n == (1 << OSC_WAVE_TABLE_SAMPLES_BITS)
@@ -99,10 +93,6 @@ $osc_harmonics_restriction_table.map { |freq| last_harmonic(freq) }.uniq.sort.re
   generate_osc_wave_table_sawtooth(i)
 end
 
-$osc_harmonics_restriction_table.map { |freq| last_harmonic(freq) }.uniq.sort.reverse.each do |i|
-  generate_osc_wave_table_triangle(i)
-end
-
 $file.printf("const uint8_t* g_osc_saw_wave_tables[] = {\n  ")
 $osc_harmonics_restriction_table.each_with_index do |freq, idx|
   $file.printf("g_osc_saw_wave_table_h%-3d,", last_harmonic(freq))
@@ -116,17 +106,6 @@ $osc_harmonics_restriction_table.each_with_index do |freq, idx|
 end
 $file.printf("};\n\n")
 
-$file.printf("const uint8_t* g_osc_tri_wave_tables[] = {\n  ")
-$osc_harmonics_restriction_table.each_with_index do |freq, idx|
-  $file.printf("g_osc_tri_wave_table_h%-3d,", last_harmonic(freq))
-  if idx == DATA_BYTE_MAX
-    $file.printf("\n")
-  elsif idx % 4 == 3
-    $file.printf("\n  ")
-  else
-    $file.printf(" ")
-  end
-end
-$file.printf("};\n\n")
+generate_osc_wave_table_sine(1)
 
 $file.close
