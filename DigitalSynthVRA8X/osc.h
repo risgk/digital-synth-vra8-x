@@ -71,17 +71,23 @@ public:
       {
         const uint8_t* wave_table = g_osc_sin_wave_table_h1;
         uint16_t freq = g_osc_freq_table[pitch_control - NOTE_NUMBER_MIN];
+        uint16_t freq_d = freq + (((m_color + 1) >> 2) << 1);
         uint16_t mod_freq = freq * mod_rate_to_fm_ratio(m_mod_rate);
+        uint16_t mod_freq_d = freq_d * mod_rate_to_fm_ratio(m_mod_rate);
 
-        m_phase_0 += mod_freq;
-        m_phase_1 += freq;
-        m_phase_2 += freq + 1;
+        m_phase_2 += mod_freq;
+        m_phase_3 += mod_freq_d;
+        m_phase_0 += freq;
+        m_phase_1 += freq_d;
 
-        int8_t wave_0 = +get_wave_level(wave_table, m_phase_0);
-        int8_t wave_1 = +get_wave_level(wave_table, m_phase_1 + ((wave_0 * high_byte(m_mod_depth * mod_eg_control)) << 1));
-        int8_t wave_2 = -get_wave_level(wave_table, m_phase_2 + ((wave_0 * high_byte(m_mod_depth * mod_eg_control)) << 1));
+        const uint8_t* saw_wave_table = g_osc_saw_wave_tables[pitch_control - NOTE_NUMBER_MIN];
 
-        int16_t mixed = (wave_1 * static_cast<uint8_t>(127 - m_color)) + (wave_2 * m_color);
+        int8_t wave_2 = +get_wave_level(saw_wave_table, m_phase_2);
+        int8_t wave_3 = +get_wave_level(saw_wave_table, m_phase_3);
+        int8_t wave_0 = +get_wave_level(wave_table, m_phase_0 + ((wave_2 * high_byte(m_mod_depth * mod_eg_control)) << 1));
+        int8_t wave_1 = +get_wave_level(wave_table, m_phase_1 + ((wave_3 * high_byte(m_mod_depth * mod_eg_control)) << 1));
+
+        int16_t mixed = wave_0 * 160 + wave_1 * 80;
         result = mixed >> 1;
       }
       break;
