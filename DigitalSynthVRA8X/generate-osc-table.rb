@@ -74,8 +74,8 @@ end
 
 $osc_harmonics_restriction_table = []
 
-(NOTE_NUMBER_MIN..NOTE_NUMBER_MAX).each do |note_number|
-  if (note_number < NOTE_NUMBER_MIN) || (note_number > NOTE_NUMBER_MAX)
+(NOTE_NUMBER_MIN..NOTE_NUMBER_MAX + 36).each do |note_number|
+  if (note_number < NOTE_NUMBER_MIN) || (note_number > NOTE_NUMBER_MAX + 36)
     freq = 0
   else
     freq = freq_from_note_number(note_number)
