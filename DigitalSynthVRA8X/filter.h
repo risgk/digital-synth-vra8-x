@@ -35,11 +35,11 @@ public:
 
   INLINE static void set_resonance(uint8_t controller_value) {
     if (controller_value >= 96) {
-      m_lpf_table = g_filter_lpf_table_q_4_sqrt_2;
+      m_lpf_table = g_filter_lpf_table_q_4;
     } else if (controller_value >= 32) {
       m_lpf_table = g_filter_lpf_table_q_2;
     } else {
-      m_lpf_table = g_filter_lpf_table_q_1_over_sqrt_2;
+      m_lpf_table = g_filter_lpf_table_q_1;
     }
   }
 
