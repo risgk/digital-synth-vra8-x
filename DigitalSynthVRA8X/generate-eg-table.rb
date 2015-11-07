@@ -28,7 +28,7 @@ end
 $file.printf("};\n\n")
 
 def decay_release_rate(t)
-  u = [[(t - 2) / 5, 0].max, 5].min
+  u = [[(t - 2) / 5, 0].max, 7].min
   rate = (((1.0 / 2.0) ** (1.0 / (2.0 ** u)))  *
           (1 << EG_DECAY_RELEASE_RATE_DENOMINATOR_BITS)).floor
 end
