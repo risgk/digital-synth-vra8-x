@@ -39,7 +39,7 @@ def generate_osc_wave_table_sawtooth(last)
       level += (2.0 / Math::PI) * Math.sin((2.0 * Math::PI) * ((n + 0.5) /
                (1 << OSC_WAVE_TABLE_SAMPLES_BITS)) * k) / k
     end
-    level = (level * OSC_WAVE_TABLE_AMPLITUDE_SAW).floor.to_i
+    level = (level * OSC_WAVE_TABLE_AMPLITUDE).floor.to_i
 
     $file.printf("%+4d,", level)
     if n == (1 << OSC_WAVE_TABLE_SAMPLES_BITS)
@@ -54,11 +54,11 @@ def generate_osc_wave_table_sawtooth(last)
 end
 
 def generate_osc_wave_table_sine(last)
-  $file.printf("const uint8_t g_osc_sin_wave_table_h%d[] PROGMEM = {\n  ", last)
+  $file.printf("const uint8_t g_osc_sine_wave_table_h%d[] PROGMEM = {\n  ", last)
   (0..(1 << OSC_WAVE_TABLE_SAMPLES_BITS)).each do |n|
     level = 0
     level += Math::sin((2.0 * Math::PI) * ((n + 0.5) / (1 << OSC_WAVE_TABLE_SAMPLES_BITS)))
-    level = (level * OSC_WAVE_TABLE_AMPLITUDE_SINE).floor.to_i
+    level = (level * OSC_WAVE_TABLE_AMPLITUDE).floor.to_i
 
     $file.printf("%+4d,", level)
     if n == (1 << OSC_WAVE_TABLE_SAMPLES_BITS)
@@ -74,22 +74,20 @@ end
 
 $osc_harmonics_restriction_table = []
 
-(NOTE_NUMBER_MIN..NOTE_NUMBER_MAX + 36).each do |note_number|
-  if (note_number < NOTE_NUMBER_MIN) || (note_number > NOTE_NUMBER_MAX + 36)
-    freq = 0
-  else
-    freq = freq_from_note_number(note_number)
-  end
+(NOTE_NUMBER_MIN..NOTE_NUMBER_MAX).each do |note_number|
+  freq = freq_from_note_number(note_number)
   $osc_harmonics_restriction_table << freq
 end
 
 def last_harmonic(freq)
-  last = (freq != 0) ? ((FREQUENCY_MAX * (1 << OSC_PHASE_RESOLUTION_BITS)) / (freq * SAMPLING_RATE)) : 0
+  last = (freq != 0) ? ((FREQUENCY_MAX *
+                         (1 << OSC_PHASE_RESOLUTION_BITS)) / (freq * SAMPLING_RATE)) : 0
   last = 127 if last > 127
   last
 end
 
-$osc_harmonics_restriction_table.map { |freq| last_harmonic(freq) }.uniq.sort.reverse.each do |i|
+$osc_harmonics_restriction_table.map { |freq| last_harmonic(freq) }.push(4).
+                                                                    uniq.sort.reverse.each do |i|
   generate_osc_wave_table_sawtooth(i)
 end
 

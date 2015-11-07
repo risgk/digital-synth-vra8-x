@@ -9,8 +9,7 @@ const uint8_t   NOTE_NUMBER_MIN = 24;
 const uint8_t   NOTE_NUMBER_MAX = 84;
 
 const uint8_t   OSC_PHASE_RESOLUTION_BITS              = 16;
-const uint8_t   OSC_WAVE_TABLE_AMPLITUDE_SAW           = 96;
-const uint8_t   OSC_WAVE_TABLE_AMPLITUDE_SINE          = 128;
+const uint8_t   OSC_WAVE_TABLE_AMPLITUDE               = 64;
 const uint8_t   OSC_WAVE_TABLE_SAMPLES_BITS            = 8;
 const uint8_t   FILTER_TABLE_FRACTION_BITS             = 14;
 const uint16_t  EG_LEVEL_MAX                           = (127 << 1) << 8;

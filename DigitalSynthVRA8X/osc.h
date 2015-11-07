@@ -40,6 +40,18 @@ public:
   }
 
   INLINE static void set_color(uint8_t controller_value) {
+    switch (m_mode) {
+    case OSC_MODE_1_FM:
+      {
+        uint8_t old_freq_detune = color_to_freq_detune(m_color);
+        uint8_t new_freq_detune = color_to_freq_detune(controller_value);
+        if (old_freq_detune != 0 && new_freq_detune == 0) {
+          reset_phase();
+        }
+      }
+      break;
+    }
+
     m_color = controller_value;
   }
 
@@ -69,45 +81,29 @@ public:
     switch (m_mode) {
     case OSC_MODE_1_FM:
       {
-        const uint8_t* wave_table = g_osc_sin_wave_table_h1;
-        uint16_t freq = g_osc_freq_table[pitch_control - NOTE_NUMBER_MIN];
-        uint16_t freq_d = freq - (((m_color + 1) >> 2) << 1);
-        // TODO: m_color == 0
+        const uint8_t* wave_table = g_osc_sine_wave_table_h1;
+        uint16_t freq = g_osc_freq_table[pitch_control - NOTE_NUMBER_MIN] >> 1;
+        uint16_t freq_detune = freq - ((m_color + 1) >> 2);
+
         uint8_t  fm_ratio = mod_rate_to_fm_ratio(m_mod_rate);
         uint16_t mod_freq = freq * fm_ratio;
-        uint16_t mod_freq_d = freq_d * fm_ratio;
+        uint16_t mod_freq_detune = freq_detune * fm_ratio;
 
-        uint8_t wave_table_offset;
-        switch (fm_ratio) {
-        case 1:
-          wave_table_offset = 0;
-          break;
-        case 2:
-          wave_table_offset = 12;
-          break;
-        case 3:
-          wave_table_offset = 19;
-          break;
-        case 4:
-          wave_table_offset = 24;
-          break;
-        case 5:
-          wave_table_offset = 31;
-          break;
-        }
-        const uint8_t* saw_wave_table = g_osc_saw_wave_tables[wave_table_offset + pitch_control - NOTE_NUMBER_MIN];
+        const uint8_t* saw_wave_table = g_osc_saw_wave_table_h4;
 
         m_phase_2 += mod_freq;
-        m_phase_3 += mod_freq_d;
+        m_phase_3 += mod_freq_detune;
         m_phase_0 += freq;
-        m_phase_1 += freq_d;
+        m_phase_1 += freq_detune;
 
-        int8_t wave_2 = +get_wave_level(saw_wave_table, m_phase_2);
-        int8_t wave_3 = +get_wave_level(saw_wave_table, m_phase_3);
-        int8_t wave_0 = +get_wave_level(wave_table, m_phase_0 + ((wave_2 * high_byte(m_mod_depth * mod_eg_control)) >> 1));
-        int8_t wave_1 = +get_wave_level(wave_table, m_phase_1 + ((wave_3 * high_byte(m_mod_depth * mod_eg_control)) >> 1));
+        int8_t wave_2 = get_wave_level(saw_wave_table, m_phase_2);
+        int8_t wave_3 = get_wave_level(saw_wave_table, m_phase_3);
+        int8_t wave_0 = get_wave_level(wave_table, m_phase_0 +
+                          ((wave_2 * high_byte(m_mod_depth * mod_eg_control)) << 2));
+        int8_t wave_1 = get_wave_level(wave_table, m_phase_1 +
+                          ((wave_3 * high_byte(m_mod_depth * mod_eg_control)) << 2));
 
-        int16_t mixed = wave_0 * 160 + wave_1 * 80;
+        int16_t mixed = wave_0 * 170 + wave_1 * 85;
         result = mixed >> 1;
       }
       break;
@@ -158,12 +154,16 @@ private:
     m_phase_3 = 0;
   }
 
+  INLINE static uint8_t color_to_freq_detune(uint8_t color) {
+    return (color + 2) >> 2;
+  }
+
   INLINE static int8_t mod_rate_to_fm_ratio(uint8_t mod_rate) {
     return ((m_mod_rate + 16) >> 5) + 1;
   }
 
   INLINE static int8_t triangle_lfo_clock(uint8_t mod_eg_control, uint8_t mod_rate) {
-    m_phase_0 += ((mod_rate + 1) >> 1) + 1;
+    m_phase_0 += (mod_rate + 2) >> 2;
 
     uint16_t level = m_phase_0;
     if ((level & 0x8000) != 0) {
