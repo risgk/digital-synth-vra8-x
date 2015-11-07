@@ -6,18 +6,19 @@
 
 template <uint8_t T>
 class EG {
-  static const uint8_t  STATE_ATTACK        = 0;
-  static const uint8_t  STATE_DECAY_SUSTAIN = 1;
-  static const uint8_t  STATE_RELEASE       = 2;
-  static const uint8_t  STATE_IDLE          = 3;
+  static const uint8_t  STATE_ATTACK  = 0;
+  static const uint8_t  STATE_DECAY   = 1;
+  static const uint8_t  STATE_RELEASE = 2;
+  static const uint8_t  STATE_IDLE    = 3;
 
   static uint8_t  m_state;
   static uint16_t m_count;
   static uint16_t m_level;
   static uint16_t m_attack_rate;
-  static uint8_t  m_eg_decay_release_rate;
-  static uint16_t m_decay_release_update_interval;
-  static uint16_t m_sustain_level;
+  static uint8_t  m_decay_rate;
+  static uint8_t  m_release_rate;
+  static uint16_t m_decay_update_interval;
+  static uint16_t m_release_update_interval;
 
 public:
   INLINE static void initialize() {
@@ -26,7 +27,6 @@ public:
     m_level = 0;
     set_attack(0);
     set_decay(0);
-    set_sustain(127);
   }
 
   INLINE static void set_attack(uint8_t controller_value) {
@@ -35,13 +35,28 @@ public:
   }
 
   INLINE static void set_decay(uint8_t controller_value) {
-    uint8_t time = controller_value >> (7 - EG_CONTROLLER_STEPS_BITS);
-    m_eg_decay_release_rate         = g_eg_decay_release_rate_table[time];
-    m_decay_release_update_interval = g_eg_decay_release_update_interval_table[time];
-  }
+    uint8_t decay_time;
+    uint8_t release_time;
 
-  INLINE static void set_sustain(uint8_t controller_value) {
-    m_sustain_level = (controller_value << 1) << 8;
+    uint8_t decay_value;
+    if (controller_value >= 64) {
+      decay_time = 255;
+      release_time = (127 - controller_value) >> (6 - EG_CONTROLLER_STEPS_BITS);
+    } else {
+      decay_time = (controller_value >> (6 - EG_CONTROLLER_STEPS_BITS)) + 10;
+      release_time = controller_value >> (6 - EG_CONTROLLER_STEPS_BITS);
+    }
+
+    if (decay_time == 255) {
+      m_decay_rate = 0;
+      m_decay_update_interval = 0;
+    } else {
+      m_decay_rate = g_eg_decay_release_rate_table[decay_time];
+      m_decay_update_interval = g_eg_decay_release_update_interval_table[decay_time];
+    }
+
+    m_release_rate = g_eg_decay_release_rate_table[release_time];
+    m_release_update_interval = g_eg_decay_release_update_interval_table[release_time];
   }
 
   INLINE static void note_on() {
@@ -51,7 +66,7 @@ public:
 
   INLINE static void note_off() {
     m_state = STATE_RELEASE;
-    m_count = m_decay_release_update_interval;
+    m_count = m_release_update_interval;
   }
 
   INLINE static int8_t clock() {
@@ -61,23 +76,23 @@ public:
       if (m_count == 0) {
         m_count = EG_ATTACK_UPDATE_INTERVAL;
         if (m_level >= EG_LEVEL_MAX - m_attack_rate) {
-          m_state = STATE_DECAY_SUSTAIN;
+          m_state = STATE_DECAY;
           m_level = EG_LEVEL_MAX;
         } else {
           m_level += m_attack_rate;
         }
       }
       break;
-    case STATE_DECAY_SUSTAIN:
-      m_count--;
-      if (m_count == 0) {
-        m_count = m_decay_release_update_interval;
-        if (m_level > m_sustain_level) {
-          if (m_level <= m_sustain_level + (EG_LEVEL_MAX >> 10)) {
-            m_level = m_sustain_level;
+    case STATE_DECAY:
+      if (m_decay_update_interval != 0) {
+        m_count--;
+        if (m_count == 0) {
+          m_count = m_decay_update_interval;
+          if (m_level <= (EG_LEVEL_MAX >> 10)) {
+            m_state = STATE_IDLE;
+            m_level = 0;
           } else {
-            m_level = m_sustain_level +
-                      mul_q16_q8(m_level - m_sustain_level, m_eg_decay_release_rate);
+            m_level = mul_q16_q8(m_level, m_decay_rate);
           }
         }
       }
@@ -85,12 +100,12 @@ public:
     case STATE_RELEASE:
       m_count--;
       if (m_count == 0) {
-        m_count = m_decay_release_update_interval;
+        m_count = m_release_update_interval;
         if (m_level <= (EG_LEVEL_MAX >> 10)) {
           m_state = STATE_IDLE;
           m_level = 0;
         } else {
-          m_level = mul_q16_q8(m_level, m_eg_decay_release_rate);
+          m_level = mul_q16_q8(m_level, m_release_rate);
         }
       }
       break;
@@ -106,6 +121,7 @@ template <uint8_t T> uint8_t  EG<T>::m_state;
 template <uint8_t T> uint16_t EG<T>::m_count;
 template <uint8_t T> uint16_t EG<T>::m_level;
 template <uint8_t T> uint16_t EG<T>::m_attack_rate;
-template <uint8_t T> uint8_t  EG<T>::m_eg_decay_release_rate;
-template <uint8_t T> uint16_t EG<T>::m_decay_release_update_interval;
-template <uint8_t T> uint16_t EG<T>::m_sustain_level;
+template <uint8_t T> uint8_t  EG<T>::m_decay_rate;
+template <uint8_t T> uint8_t  EG<T>::m_release_rate;
+template <uint8_t T> uint16_t EG<T>::m_decay_update_interval;
+template <uint8_t T> uint16_t EG<T>::m_release_update_interval;

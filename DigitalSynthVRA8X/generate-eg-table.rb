@@ -46,7 +46,7 @@ def decay_release_update_interval(t)
 end
 
 $file.printf("const uint8_t g_eg_decay_release_rate_table[] = {\n  ")
-(0..((1 << EG_CONTROLLER_STEPS_BITS) - 1)).each do |time|
+(0..((1 << EG_CONTROLLER_STEPS_BITS) - 1) + 10).each do |time|
   t = time
   t = 1 if t == 0
   rate = decay_release_rate(t)
@@ -63,7 +63,7 @@ end
 $file.printf("};\n\n")
 
 $file.printf("const uint16_t g_eg_decay_release_update_interval_table[] = {\n  ")
-(0..((1 << EG_CONTROLLER_STEPS_BITS) - 1)).each do |time|
+(0..((1 << EG_CONTROLLER_STEPS_BITS) - 1) + 10).each do |time|
   t = time
   t = 1 if t == 0
   update_interval = decay_release_update_interval(t)
