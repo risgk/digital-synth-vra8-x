@@ -99,9 +99,9 @@ public:
         int8_t wave_2 = get_wave_level(saw_wave_table, m_phase_2);
         int8_t wave_3 = get_wave_level(saw_wave_table, m_phase_3);
         int8_t wave_0 = get_wave_level(wave_table, m_phase_0 +
-                          ((wave_2 * high_byte(m_mod_depth * mod_eg_control)) << 2));
+                          ((wave_2 * high_byte(m_mod_depth * mod_eg_control)) << 3));
         int8_t wave_1 = get_wave_level(wave_table, m_phase_1 +
-                          ((wave_3 * high_byte(m_mod_depth * mod_eg_control)) << 2));
+                          ((wave_3 * high_byte(m_mod_depth * mod_eg_control)) << 3));
 
         int16_t mixed = wave_0 * 170 + wave_1 * 85;
         result = mixed >> 1;
@@ -155,15 +155,15 @@ private:
   }
 
   INLINE static uint8_t color_to_freq_detune(uint8_t color) {
-    return (color + 2) >> 2;
+    return color >> 1;
   }
 
   INLINE static int8_t mod_rate_to_fm_ratio(uint8_t mod_rate) {
-    return ((m_mod_rate + 16) >> 5) + 1;
+    return (m_mod_rate >> 2) + 1;
   }
 
   INLINE static int8_t triangle_lfo_clock(uint8_t mod_eg_control, uint8_t mod_rate) {
-    m_phase_0 += (mod_rate + 2) >> 2;
+    m_phase_0 += mod_rate >> 1;
 
     uint16_t level = m_phase_0;
     if ((level & 0x8000) != 0) {
