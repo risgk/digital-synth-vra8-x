@@ -11,7 +11,7 @@ void setup() {
 }
 
 void loop() {
-  while(true) {
+  while (true) {
     if (SerialIn<0>::available()) {
       uint8_t b = SerialIn<0>::read();
       Synth<0>::receive_midi_byte(b);
