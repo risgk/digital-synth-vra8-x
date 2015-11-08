@@ -49,6 +49,7 @@ public:
   INLINE static void set_color(uint8_t controller_value) {
     switch (m_mode) {
     case OSC_MODE_FM:
+    case OSC_MODE_SYNC_FM:
       {
         uint8_t old_low_freq = value_to_low_freq(m_color);
         uint8_t new_low_freq = value_to_low_freq(controller_value);
@@ -104,7 +105,7 @@ public:
       {
         uint16_t freq_detune = m_freq - value_to_low_freq(m_color);
 
-        uint8_t  fm_ratio = mod_rate_to_fm_ratio(m_mod_rate);
+        uint8_t fm_ratio = mod_rate_to_fm_ratio(m_mod_rate);
         uint16_t mod_freq = (m_freq >> 1) * fm_ratio;
         uint16_t mod_freq_detune = freq_detune * fm_ratio;
 
@@ -116,6 +117,25 @@ public:
 
         int8_t wave_2 = get_wave_level(g_osc_saw_wave_table_h4, m_phase_2);
         int8_t wave_3 = get_wave_level(g_osc_saw_wave_table_h4, m_phase_3);
+
+        int8_t wave_0 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_0 +
+                          ((wave_2 * high_byte(m_mod_depth * mod_eg_control)) << 3));
+        int8_t wave_1 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_1 +
+                          ((wave_3 * high_byte(m_mod_depth * mod_eg_control)) << 3));
+
+        int16_t mixed = wave_0 * 170 + wave_1 * 85;
+        result = mixed >> 1;
+      }
+      break;
+    case OSC_MODE_SYNC_FM:
+      {
+        uint16_t freq_detune = m_freq - value_to_low_freq(m_color);
+        m_phase_0 += m_freq;
+        m_phase_1 += freq_detune;
+
+        uint8_t fm_ratio = m_mod_rate + 8;
+        int8_t wave_2 = get_wave_level(g_osc_saw_wave_table_h4, (uint16_t) ((m_phase_0 >> 4) * fm_ratio));
+        int8_t wave_3 = get_wave_level(g_osc_saw_wave_table_h4, (uint16_t) ((m_phase_1 >> 4) * fm_ratio));
 
         int8_t wave_0 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_0 +
                           ((wave_2 * high_byte(m_mod_depth * mod_eg_control)) << 3));
