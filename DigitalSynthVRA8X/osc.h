@@ -115,13 +115,13 @@ public:
         m_phase_0 += m_freq;
         m_phase_1 += freq_detune;
 
-        int8_t wave_2 = get_wave_level(g_osc_saw_wave_table_h4, m_phase_2);
-        int8_t wave_3 = get_wave_level(g_osc_saw_wave_table_h4, m_phase_3);
+        int8_t wave_2 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_2);
+        int8_t wave_3 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_3);
 
         int8_t wave_0 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_0 +
-                          ((wave_2 * high_byte(m_mod_depth * mod_eg_control)) << 3));
+                          ((wave_2 * high_byte((m_mod_depth + 1) * mod_eg_control)) << 3));
         int8_t wave_1 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_1 +
-                          ((wave_3 * high_byte(m_mod_depth * mod_eg_control)) << 3));
+                          ((wave_3 * high_byte((m_mod_depth + 1) * mod_eg_control)) << 3));
 
         int16_t mixed = wave_0 * 170 + wave_1 * 85;
         result = mixed >> 1;
@@ -133,14 +133,14 @@ public:
         m_phase_0 += m_freq;
         m_phase_1 += freq_detune;
 
-        uint8_t fm_ratio = m_mod_rate + 8;
-        int8_t wave_2 = get_wave_level(g_osc_saw_wave_table_h4, (uint16_t) ((m_phase_0 >> 4) * fm_ratio));
-        int8_t wave_3 = get_wave_level(g_osc_saw_wave_table_h4, (uint16_t) ((m_phase_1 >> 4) * fm_ratio));
+        uint8_t fm_ratio = m_mod_rate + 4;
+        int8_t wave_2 = get_wave_level(g_osc_sine_wave_table_h1, (uint16_t) ((m_phase_0 >> 3) * fm_ratio));
+        int8_t wave_3 = get_wave_level(g_osc_sine_wave_table_h1, (uint16_t) ((m_phase_1 >> 3) * fm_ratio));
 
         int8_t wave_0 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_0 +
-                          ((wave_2 * high_byte(m_mod_depth * mod_eg_control)) << 3));
+                          ((wave_2 * high_byte((m_mod_depth + 1) * mod_eg_control)) << 3));
         int8_t wave_1 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_1 +
-                          ((wave_3 * high_byte(m_mod_depth * mod_eg_control)) << 3));
+                          ((wave_3 * high_byte((m_mod_depth + 1) * mod_eg_control)) << 3));
 
         int16_t mixed = wave_0 * 170 + wave_1 * 85;
         result = mixed >> 1;
@@ -206,7 +206,7 @@ private:
   }
 
   INLINE static int8_t mod_rate_to_fm_ratio(uint8_t mod_rate) {
-    return (m_mod_rate >> 3) + 1;
+    return (m_mod_rate >> 2) + 1;
   }
 
   INLINE static int8_t triangle_lfo_clock(uint8_t mod_eg_control, uint8_t mod_rate) {
@@ -217,7 +217,7 @@ private:
       level = ~level;
     }
     level -= 0x4000;
-    return high_sbyte(high_sbyte(level << 1) * mod_eg_control);
+    return high_sbyte((high_sbyte(level << 1) + 1) * mod_eg_control);
   }
 
   INLINE static int8_t get_wave_level(const uint8_t* wave_table, uint16_t phase) {

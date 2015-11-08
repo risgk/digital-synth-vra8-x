@@ -86,8 +86,7 @@ def last_harmonic(freq)
   last
 end
 
-$osc_harmonics_restriction_table.map { |freq| last_harmonic(freq) }.push(4).
-                                                                    uniq.sort.reverse.each do |i|
+$osc_harmonics_restriction_table.map { |freq| last_harmonic(freq) }.uniq.sort.reverse.each do |i|
   generate_osc_wave_table_sawtooth(i)
 end
 
