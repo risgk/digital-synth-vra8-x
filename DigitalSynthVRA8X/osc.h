@@ -161,8 +161,8 @@ public:
 
         int8_t d = m_mod_depth >> 2;
         int8_t r = (m_color < 64) ? d : -d;
-        result = (wave_0 * 63) + (wave_1 * r) + (wave_2 * d) +
-                                 (wave_3 * d) + (wave_4 * r);
+        result = (wave_0 * (126 - d)) + (wave_1 * r)        + (wave_2 * d) +
+                                        (wave_3 * (d >> 1)) + (wave_4 * (r >> 1));
       }
       break;
     }
