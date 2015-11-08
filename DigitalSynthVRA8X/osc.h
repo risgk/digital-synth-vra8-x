@@ -48,12 +48,11 @@ public:
 
   INLINE static void set_color(uint8_t controller_value) {
     switch (m_mode) {
-    case OSC_MODE_1_FM:
-    case OSC_MODE_9_SAW:
+    case OSC_MODE_FM:
       {
-        uint8_t old_freq_detune = value_to_low_freq(m_color);
-        uint8_t new_freq_detune = value_to_low_freq(controller_value);
-        if (old_freq_detune != 0 && new_freq_detune == 0) {
+        uint8_t old_low_freq = value_to_low_freq(m_color);
+        uint8_t new_low_freq = value_to_low_freq(controller_value);
+        if (old_low_freq != 0 && new_low_freq == 0) {
           reset_phase();
         }
       }
@@ -65,11 +64,20 @@ public:
 
   INLINE static void set_mod_rate(uint8_t controller_value) {
     switch (m_mode) {
-    case OSC_MODE_1_FM:
+    case OSC_MODE_FM:
       {
         uint8_t old_fm_ratio = mod_rate_to_fm_ratio(m_mod_rate);
         uint8_t new_fm_ratio = mod_rate_to_fm_ratio(controller_value);
         if (old_fm_ratio != new_fm_ratio) {
+          reset_phase();
+        }
+      }
+      break;
+    case OSC_MODE_SAW_SAW:
+      {
+        uint8_t old_low_freq = value_to_low_freq(m_mod_rate);
+        uint8_t new_low_freq = value_to_low_freq(controller_value);
+        if (old_low_freq != 0 && new_low_freq == 0) {
           reset_phase();
         }
       }
@@ -92,7 +100,7 @@ public:
     int16_t result = 0;
 
     switch (m_mode) {
-    case OSC_MODE_1_FM:
+    case OSC_MODE_FM:
       {
         uint16_t freq_detune = m_freq - value_to_low_freq(m_color);
 
@@ -118,41 +126,43 @@ public:
         result = mixed >> 1;
       }
       break;
-    case OSC_MODE_5_PWM_SAW:
+    case OSC_MODE_PWM_SAW:
       {
         int8_t mod_lfo_control = triangle_lfo_clock(mod_eg_control, m_mod_rate);
         int16_t shift_lfo = mod_lfo_control * m_mod_depth;
 
         m_phase_0 += m_freq;
 
-        int8_t saw_down      = +get_wave_level(m_wave_table, m_phase_0);
-        int8_t saw_up        = -get_wave_level(m_wave_table, m_phase_0 + (128 << 8) - shift_lfo);
-        int8_t saw_down_copy = +get_wave_level(m_wave_table, m_phase_0              + shift_lfo);
+        int8_t saw_down      = get_wave_level(m_wave_table, m_phase_0);
+        int8_t saw_up        = get_wave_level(m_wave_table, m_phase_0 + (128 << 8) - shift_lfo);
+        int8_t saw_down_copy = get_wave_level(m_wave_table, m_phase_0              + shift_lfo);
 
-        int16_t mixed = saw_down      * 127 +
-                        saw_up        * static_cast<uint8_t>(127 - m_color) +
-                        saw_down_copy * m_color;
+        int16_t mixed = +(saw_down      * 127) +
+                        -(saw_up        * static_cast<uint8_t>(127 - m_color)) +
+                        +(saw_down_copy * m_color);
         result = mixed >> 1;
       }
       break;
-    case OSC_MODE_9_SAW:
+    case OSC_MODE_SAW_SAW:
       {
-        uint16_t low_freq = value_to_low_freq(m_color);
+        uint16_t low_freq = value_to_low_freq(m_mod_rate) + 1;
+        uint16_t low_freq_x2 = low_freq << 1;
         m_phase_0 += m_freq;
         m_phase_1 += m_freq - low_freq;
         m_phase_2 += m_freq + low_freq;
-        m_phase_3 += m_freq - (low_freq << 1);
-        m_phase_4 += m_freq + (low_freq << 1);
-        m_phase_5 += m_freq - (low_freq << 1) - low_freq;
+        m_phase_3 += m_freq - low_freq_x2;
+        m_phase_4 += m_freq + low_freq_x2;
 
-        int8_t wave_0 = +get_wave_level(m_wave_table, m_phase_0);
-        int8_t wave_1 = -get_wave_level(m_wave_table, m_phase_1);
-        int8_t wave_2 = +get_wave_level(m_wave_table, m_phase_2);
-        int8_t wave_3 = +get_wave_level(m_wave_table, m_phase_3);
-        int8_t wave_4 = -get_wave_level(m_wave_table, m_phase_4);
-        int8_t wave_5 = +get_wave_level(m_wave_table, m_phase_5);
+        int8_t wave_0 = get_wave_level(m_wave_table, m_phase_0);
+        int8_t wave_1 = get_wave_level(m_wave_table, m_phase_1);
+        int8_t wave_2 = get_wave_level(m_wave_table, m_phase_2);
+        int8_t wave_3 = get_wave_level(m_wave_table, m_phase_3);
+        int8_t wave_4 = get_wave_level(m_wave_table, m_phase_4);
 
-        result = wave_0 * 60 + wave_1 * 30 + wave_2 * 30 + wave_3 * 30 + wave_4 * 30 + wave_5 * 30;
+        int8_t d = m_mod_depth >> 2;
+        int8_t r = (m_color < 64) ? d : -d;
+        result = (wave_0 * 63) + (wave_1 * r) + (wave_2 * d) +
+                                 (wave_3 * d) + (wave_4 * r);
       }
       break;
     }

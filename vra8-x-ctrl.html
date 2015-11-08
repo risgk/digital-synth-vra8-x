@@ -200,15 +200,15 @@ function updateDisplayOfControl(number, value) {
     var mode = Math.floor((parseInt(value) + 8) / 16) + 1;
     var str = "";
     switch (mode) {
-    case 1: str = "FM";       break;
-    case 2: str = "----";     break;
-    case 3: str = "----";     break;
-    case 4: str = "----";     break;
-    case 5: str = "PWM+SAW";  break;
-    case 6: str = "----";     break;
-    case 7: str = "SYNC+FM";  break;
-    case 8: str = "----";     break;
-    case 9: str = "SAW";      break;
+    case 1: str = "FM";      break;
+    case 2: str = "----";    break;
+    case 3: str = "----";    break;
+    case 4: str = "----";    break;
+    case 5: str = "PWM+SAW"; break;
+    case 6: str = "----";    break;
+    case 7: str = "SYNC+FM"; break;
+    case 8: str = "----";    break;
+    case 9: str = "SAW+SAW"; break;
     }
     document.getElementById("spanCC" + String(number)).innerHTML = value + ": " + str;
   } else {
@@ -229,9 +229,9 @@ function preset(number) {
   soundOff();
   var presetControllers = {};
   presetControllers[OSC_MODE     ] = [0  , 16 , 32 , 48 , 64 , 80 , 96 , 112, 127 ];
-  presetControllers[OSC_COLOR    ] = [16 , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 8   ];
-  presetControllers[MOD_RATE     ] = [16 , 0  , 0  , 0  , 8  , 0  , 0  , 0  , 0   ];
-  presetControllers[MOD_DEPTH    ] = [32 , 0  , 0  , 0  , 64 , 0  , 0  , 0  , 0   ];
+  presetControllers[OSC_COLOR    ] = [16 , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0   ];
+  presetControllers[MOD_RATE     ] = [16 , 0  , 0  , 0  , 8  , 0  , 0  , 0  , 8   ];
+  presetControllers[MOD_DEPTH    ] = [32 , 0  , 0  , 0  , 64 , 0  , 0  , 0  , 127 ];
   presetControllers[LPF_CUTOFF   ] = [127, 127, 127, 127, 127, 127, 127, 127, 127 ];
   presetControllers[LPF_RESONANCE] = [127, 0  , 0  , 0  , 127, 0  , 0  , 0  , 127 ];
   presetControllers[ENV_A        ] = [24 , 0  , 0  , 0  , 24 , 0  , 0  , 0  , 24  ];
@@ -324,17 +324,17 @@ function noteOff(noteNumber) {
 &nbsp;
 
 <table>
-<tr><td><input type="button" value="FM"       onclick="preset(1)"         ></td>
-    <td><input type="button" value="----"     onclick="preset(2)" disabled></td>
-    <td><input type="button" value="----"     onclick="preset(3)"         ></td>
+<tr><td><input type="button" value="FM"      onclick="preset(1)"         ></td>
+    <td><input type="button" value="----"    onclick="preset(2)" disabled></td>
+    <td><input type="button" value="----"    onclick="preset(3)"         ></td>
     <td>&nbsp;</td>
-    <td><input type="button" value="----"     onclick="preset(4)" disabled></td>
-    <td><input type="button" value="PWM+SAW"  onclick="preset(5)"         ></td>
-    <td><input type="button" value="----"     onclick="preset(6)" disabled></td>
+    <td><input type="button" value="----"    onclick="preset(4)" disabled></td>
+    <td><input type="button" value="PWM+SAW" onclick="preset(5)"         ></td>
+    <td><input type="button" value="----"    onclick="preset(6)" disabled></td>
     <td>&nbsp;</td>
-    <td><input type="button" value="SYNC+FM"  onclick="preset(7)"         ></td>
-    <td><input type="button" value="----"     onclick="preset(8)" disabled></td>
-    <td><input type="button" value="SAW"      onclick="preset(9)"         ></td></tr>
+    <td><input type="button" value="SYNC+FM" onclick="preset(7)"         ></td>
+    <td><input type="button" value="----"    onclick="preset(8)" disabled></td>
+    <td><input type="button" value="SAW+SAW" onclick="preset(9)"         ></td></tr>
 </table>
 
 <table>
