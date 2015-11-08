@@ -107,7 +107,7 @@ public:
 
         uint8_t fm_ratio = mod_rate_to_fm_ratio(m_mod_rate);
         uint16_t mod_freq = (m_freq >> 1) * fm_ratio;
-        uint16_t mod_freq_detune = freq_detune * fm_ratio;
+        uint16_t mod_freq_detune = (freq_detune >> 1) * fm_ratio;
 
         m_phase_2 += mod_freq;
         m_phase_3 += mod_freq_detune;
