@@ -13,6 +13,8 @@ class Osc {
   static uint16_t       m_phase_1;
   static uint16_t       m_phase_2;
   static uint16_t       m_phase_3;
+  static uint16_t       m_phase_4;
+  static uint16_t       m_phase_5;
   static uint8_t        m_mode;
   static uint8_t        m_color;
   static uint16_t       m_mod_rate;
@@ -27,6 +29,8 @@ public:
     m_phase_1 = 0;
     m_phase_2 = 0;
     m_phase_3 = 0;
+    m_phase_4 = 0;
+    m_phase_5 = 0;
     m_mode = 0;
     set_mode(0);
     set_color(0);
@@ -45,6 +49,7 @@ public:
   INLINE static void set_color(uint8_t controller_value) {
     switch (m_mode) {
     case OSC_MODE_1_FM:
+    case OSC_MODE_9_SAW:
       {
         uint8_t old_freq_detune = value_to_low_freq(m_color);
         uint8_t new_freq_detune = value_to_low_freq(controller_value);
@@ -61,7 +66,6 @@ public:
   INLINE static void set_mod_rate(uint8_t controller_value) {
     switch (m_mode) {
     case OSC_MODE_1_FM:
-    case OSC_MODE_9_SAW:
       {
         uint8_t old_fm_ratio = mod_rate_to_fm_ratio(m_mod_rate);
         uint8_t new_fm_ratio = mod_rate_to_fm_ratio(controller_value);
@@ -133,19 +137,22 @@ public:
       break;
     case OSC_MODE_9_SAW:
       {
-        uint16_t low_freq = value_to_low_freq(m_color) - 1;
+        uint16_t low_freq = value_to_low_freq(m_color);
         m_phase_0 += m_freq;
         m_phase_1 += m_freq - low_freq;
         m_phase_2 += m_freq + low_freq;
         m_phase_3 += m_freq - (low_freq << 1);
+        m_phase_4 += m_freq + (low_freq << 1);
+        m_phase_5 += m_freq - (low_freq << 1) - low_freq;
 
         int8_t wave_0 = +get_wave_level(m_wave_table, m_phase_0);
         int8_t wave_1 = -get_wave_level(m_wave_table, m_phase_1);
         int8_t wave_2 = +get_wave_level(m_wave_table, m_phase_2);
         int8_t wave_3 = +get_wave_level(m_wave_table, m_phase_3);
+        int8_t wave_4 = -get_wave_level(m_wave_table, m_phase_4);
+        int8_t wave_5 = +get_wave_level(m_wave_table, m_phase_5);
 
-        int16_t mixed = wave_0 * 63 + wave_1 * 63 + wave_2 * 63 + wave_3 * 63;
-        result = mixed >> 1;
+        result = wave_0 * 60 + wave_1 * 30 + wave_2 * 30 + wave_3 * 30 + wave_4 * 30 + wave_5 * 30;
       }
       break;
     }
@@ -160,10 +167,12 @@ private:
     m_phase_1 = 0;
     m_phase_2 = 0;
     m_phase_3 = 0;
+    m_phase_4 = 0;
+    m_phase_5 = 0;
   }
 
   INLINE static uint8_t value_to_low_freq(uint8_t value) {
-    return (value >> 1) + 1;
+    return value >> 1;
   }
 
   INLINE static int8_t mod_rate_to_fm_ratio(uint8_t mod_rate) {
@@ -171,7 +180,7 @@ private:
   }
 
   INLINE static int8_t triangle_lfo_clock(uint8_t mod_eg_control, uint8_t mod_rate) {
-    m_phase_lfo += value_to_low_freq(mod_rate);
+    m_phase_lfo += value_to_low_freq(mod_rate) + 1;
 
     uint16_t level = m_phase_lfo;
     if ((level & 0x8000) != 0) {
@@ -202,6 +211,8 @@ template <uint8_t T> uint16_t        Osc<T>::m_phase_0;
 template <uint8_t T> uint16_t        Osc<T>::m_phase_1;
 template <uint8_t T> uint16_t        Osc<T>::m_phase_2;
 template <uint8_t T> uint16_t        Osc<T>::m_phase_3;
+template <uint8_t T> uint16_t        Osc<T>::m_phase_4;
+template <uint8_t T> uint16_t        Osc<T>::m_phase_5;
 template <uint8_t T> uint8_t         Osc<T>::m_mode;
 template <uint8_t T> uint8_t         Osc<T>::m_color;
 template <uint8_t T> uint16_t        Osc<T>::m_mod_rate;
