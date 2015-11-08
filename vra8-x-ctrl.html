@@ -229,13 +229,13 @@ function preset(number) {
   soundOff();
   var presetControllers = {};
   presetControllers[OSC_MODE     ] = [0  , 16 , 32 , 48 , 64 , 80 , 96 , 112, 127 ];
-  presetControllers[OSC_COLOR    ] = [16 , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 0   ];
-  presetControllers[MOD_RATE     ] = [16 , 0  , 0  , 0  , 8  , 0  , 0  , 0  , 8   ];
-  presetControllers[MOD_DEPTH    ] = [32 , 0  , 0  , 0  , 64 , 0  , 0  , 0  , 127 ];
+  presetControllers[OSC_COLOR    ] = [8  , 0  , 0  , 0  , 0  , 0  , 0  , 0  , 127 ];
+  presetControllers[MOD_RATE     ] = [8  , 0  , 0  , 0  , 8  , 0  , 8  , 0  , 8   ];
+  presetControllers[MOD_DEPTH    ] = [64 , 0  , 0  , 0  , 64 , 0  , 64 , 0  , 127 ];
   presetControllers[LPF_CUTOFF   ] = [127, 127, 127, 127, 127, 127, 127, 127, 127 ];
-  presetControllers[LPF_RESONANCE] = [127, 0  , 0  , 0  , 127, 0  , 0  , 0  , 127 ];
-  presetControllers[ENV_A        ] = [24 , 0  , 0  , 0  , 24 , 0  , 0  , 0  , 24  ];
-  presetControllers[ENV_D        ] = [56 , 127, 127, 127, 56 , 127, 127, 127, 56  ];
+  presetControllers[LPF_RESONANCE] = [127, 0  , 0  , 0  , 127, 0  , 127, 0  , 127 ];
+  presetControllers[ENV_A        ] = [24 , 0  , 0  , 0  , 24 , 0  , 24 , 0  , 24  ];
+  presetControllers[ENV_D        ] = [48 , 127, 127, 127, 48 , 127, 48 , 127, 48  ];
 
   for (var i = CONTROLLERS_FIRST; i <= CONTROLLERS_LAST; i++) {
     onChangeControlChange(i, presetControllers[i][number - 1]);
