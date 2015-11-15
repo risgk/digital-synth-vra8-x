@@ -163,22 +163,18 @@ public:
       break;
     case OSC_MODE_RM_PWM:
       {
-        uint8_t mod_lfo_control = (triangle_lfo_clock(mod_eg_control, m_mod_rate) + 128) >> 1;
-        uint16_t shift_lfo = mod_lfo_control * m_mod_depth;
-        uint8_t shift_lfo_high = high_sbyte(shift_lfo);
-
         m_phase_0 += m_freq;
 
-        int8_t saw_main = get_wave_level(m_wave_table, m_phase_0);
-        int8_t saw_down = get_wave_level(m_wave_table, m_phase_0 - (shift_lfo >> 1));
-        int8_t saw_up   = get_wave_level(m_wave_table, m_phase_0 + (shift_lfo >> 1));
+        int8_t harm_s = ((m_color & (1 << 1)) != 0) ? get_triangle_wave_level(0) : 0;
+        int8_t harm_1 =                               get_triangle_wave_level(m_phase_0);
+        int8_t harm_2 = ((m_color & (1 << 2)) != 0) ? get_triangle_wave_level(m_phase_0 << 1) : 0;
+        int8_t harm_3 = ((m_color & (1 << 3)) != 0) ? get_triangle_wave_level(0) : 0;
+        int8_t harm_4 = ((m_color & (1 << 4)) != 0) ? get_triangle_wave_level(m_phase_0 << 2) : 0;
+        int8_t harm_5 = ((m_color & (1 << 5)) != 0) ? get_triangle_wave_level(0) : 0;
+        int8_t harm_6 = ((m_color & (1 << 6)) != 0) ? get_triangle_wave_level(0) : 0;
+        int8_t harm_8 = ((m_color & (1 << 7)) != 0) ? get_triangle_wave_level(m_phase_0 << 3) : 0;
 
-        uint8_t dc_correction = (128 - shift_lfo_high) >> 1;
-
-        // Ring Modulation
-        int16_t mixed = (saw_main * (saw_down - saw_up + dc_correction)) << 2;
-
-        result = mixed >> 1;
+        result = (harm_s + harm_1 + harm_2 + harm_3 + harm_4 + harm_5 + harm_6 + harm_8) << 6;
       }
       break;
     case OSC_MODE_SAW:
@@ -242,6 +238,15 @@ private:
     }
     level -= 0x4000;
     return high_sbyte((high_sbyte(level << 1) + 1) * mod_eg_control);
+  }
+
+  INLINE static int8_t get_triangle_wave_level(uint16_t phase) {
+    uint8_t level = high_byte(phase + 0x4000);
+    if ((level & 0x80) != 0) {
+      level = ~level;
+    }
+    level -= 0x40;
+    return static_cast<int8_t>(level);
   }
 
   INLINE static int8_t get_wave_level(const uint8_t* wave_table, uint16_t phase) {
