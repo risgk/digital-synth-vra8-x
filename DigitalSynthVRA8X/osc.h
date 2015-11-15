@@ -163,24 +163,16 @@ public:
       break;
     case OSC_MODE_RM_PWM:
       {
-        int8_t mod_lfo_control = triangle_lfo_clock(mod_eg_control, m_mod_rate);
+        uint8_t mod_lfo_control = (triangle_lfo_clock(mod_eg_control, m_mod_rate) + 128) >> 1;
         int16_t shift_lfo = mod_lfo_control * m_mod_depth;
-
-        shift_lfo = static_cast<int16_t>(m_color) << 8;
         int8_t shift_lfo_high = high_sbyte(shift_lfo);
 
         m_phase_0 += m_freq;
 
-        int8_t saw_down = get_wave_level(m_wave_table, m_phase_0 + (shift_lfo >> 1));
-        int8_t saw_up   = get_wave_level(m_wave_table, m_phase_0 - (shift_lfo >> 1));
+        int8_t saw_down = get_wave_level(m_wave_table, m_phase_0 - (shift_lfo >> 1));
+        int8_t saw_up   = get_wave_level(m_wave_table, m_phase_0 + (shift_lfo >> 1));
 
-        int8_t dc_correction;
-        if (shift_lfo_high == 0) {
-          dc_correction = +32;
-        } else {
-          dc_correction = (shift_lfo_high - 128) >> 2;
-        }
-
+        int8_t dc_correction = (128 - shift_lfo_high) >> 2;
         int16_t mixed = +(saw_down * 127) + -(saw_up * 127) + (dc_correction << 8);
         result = mixed >> 1;
       }
