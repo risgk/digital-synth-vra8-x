@@ -13,23 +13,23 @@ td {
 }
 td.key {
   text-align: center;
-  width: 46px;
+  width: 44px;
   height: 60px;
-  border: 1px solid teal;
+  border: 2px solid teal;
 }
 td.keyb {
   color: white;
   background-color: navy;
   text-align: center;
-  width: 46px;
+  width: 44px;
   height: 60px;
-  border: 1px solid teal;
+  border: 2px solid teal;
 }
 td.keyh {
   text-align: center;
-  width: 20px;
+  width: 18px;
   height: 60px;
-  border: 1px solid teal;
+  border: 2px solid teal;
 }
 </style>
 <script>
@@ -229,11 +229,11 @@ function preset(number) {
   soundOff();
   var presetControllers = {};
   presetControllers[OSC_MODE      ] = [0  , 0  , 16 , 32 , 48 , 64 , 80 , 96 , 112, 127 ];
-  presetControllers[OSC_COLOR     ] = [0  , 0  , 0  , 0  , 0  , 0  , 0  , 8  , 0  , 8   ];
-  presetControllers[MOD_RATE      ] = [0  , 8  , 0  , 0  , 0  , 8  , 0  , 8  , 0  , 8   ];
-  presetControllers[MOD_DEPTH     ] = [0  , 96 , 0  , 0  , 0  , 127, 0  , 64 , 0  , 64  ];
+  presetControllers[OSC_COLOR     ] = [0  , 0  , 15 , 0  , 0  , 0  , 0  , 8  , 0  , 8   ];
+  presetControllers[MOD_RATE      ] = [0  , 8  , 8  , 8  , 8  , 8  , 8  , 8  , 8  , 8   ];
+  presetControllers[MOD_DEPTH     ] = [0  , 96 , 64 , 64 , 64 , 64 , 64 , 64 , 64 , 64  ];
   presetControllers[LPF_CUTOFF_ENV] = [127, 64 , 64 , 64 , 64 , 64 , 64 , 64 , 64 , 64  ];
-  presetControllers[LPF_RESONANCE ] = [0  , 127, 0  , 0  , 0  , 127, 0  , 127, 0  , 127 ];
+  presetControllers[LPF_RESONANCE ] = [0  , 127, 127, 127, 127, 127, 127, 127, 127, 127 ];
   presetControllers[ENV_A         ] = [0  , 24 , 24 , 24 , 24 , 24 , 24 , 24 , 24 , 24  ];
   presetControllers[ENV_D_R       ] = [127, 48 , 48 , 48 , 48 , 48 , 48 , 48 , 48 , 48  ];
 
@@ -316,14 +316,13 @@ function noteOff(noteNumber) {
     <td>MIDI OUT</td>
     <td colspan="2"><select id="selectOutputPort" size="1" onchange="onChangeOutputPort()"></select></td>
     <td>&nbsp;</td>
-    <td>KEYBOARD TRANSPOSE</td>
+    <td>KBD TRANSPOSE</td>
     <td><input id="inputTranspose" type="range" min="-24" max="12" step="12" oninput="onChangeTranspose(value)" ></td><td><span id="spanTranspose" >-1</span></td></tr>
 </table>
 
-&nbsp;
-
 <table>
-<tr><td><input type="button" value="SAW"     onclick="preset(1)"         ></td>
+<tr><td>PRESET</td>
+    <td><input type="button" value="SAW"     onclick="preset(1)"         ></td>
     <td><input type="button" value="----"    onclick="preset(2)" disabled></td>
     <td><input type="button" value="RM+PWM"  onclick="preset(3)"         ></td>
     <td>&nbsp;</td>
@@ -347,11 +346,19 @@ function noteOff(noteNumber) {
     <td><input type="button" value="SAVE #2" onclick="saveControllers(2)"></td>
     <td><input type="button" value="SAVE #3" onclick="saveControllers(3)"></td>
     <td>&nbsp;</td>
-    <td><input type="button" value="NEUTRAL" onclick="preset(0)"         ></td>
+    <td><input type="button" value="NEUTRAL" onclick="preset(0)"         ></td></tr>
+<tr><td><input type="button" value="LOAD #4" onclick="loadControllers(4)"></td>
+    <td><input type="button" value="LOAD #5" onclick="loadControllers(5)"></td>
+    <td><input type="button" value="LOAD #6" onclick="loadControllers(6)"></td>
+    <td><input type="button" value="LOAD #7" onclick="loadControllers(7)"></td>
+    <td>&nbsp;</td>
+    <td><input type="button" value="SAVE #4" onclick="saveControllers(4)"></td>
+    <td><input type="button" value="SAVE #5" onclick="saveControllers(5)"></td>
+    <td><input type="button" value="SAVE #6" onclick="saveControllers(6)"></td>
+    <td><input type="button" value="SAVE #7" onclick="saveControllers(7)"></td>
+    <td>&nbsp;</td>
     <td><input type="button" value="RANDOM"  onclick="setRandom()"       ></td></tr>
 </table>
-
-&nbsp;
 
 <table>
 <tr><td>OSC MODE      </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
@@ -380,8 +387,6 @@ function noteOff(noteNumber) {
     <td><span id="spanCC22">-1</span></td><td></td>
     <td><span id="spanCC23">-1</span></td></tr>
 </table>
-
-&nbsp;
 
 <table>
 <tr>

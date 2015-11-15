@@ -36,7 +36,7 @@ public:
       IOsc<0>::set_mod_depth(controller_value);
       break;
     case LPF_CUTOFF_ENV:
-      IFilter<0>::set_cutoff_env(controller_value);
+      IFilter<0>::set_cutoff(controller_value);
       break;
     case LPF_RESONANCE:
       IFilter<0>::set_resonance(controller_value);

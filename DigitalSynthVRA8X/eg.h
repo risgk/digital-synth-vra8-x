@@ -26,7 +26,7 @@ public:
     m_count = 0;
     m_level = 0;
     set_attack(0);
-    set_decay_release(0);
+    set_decay_release(127);
   }
 
   INLINE static void set_attack(uint8_t controller_value) {

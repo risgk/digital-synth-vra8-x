@@ -6,8 +6,8 @@
 
 template <uint8_t T>
 class Osc {
-  static uint16_t       m_freq;
   static const uint8_t* m_wave_table;
+  static uint16_t       m_freq;
   static uint16_t       m_phase_lfo;
   static uint16_t       m_phase_0;
   static uint16_t       m_phase_1;
@@ -22,8 +22,8 @@ class Osc {
 
 public:
   INLINE static void initialize() {
-    m_freq = 1;
     m_wave_table = g_osc_sine_wave_table_h1;
+    m_freq = 1;
     reset_phase();
     set_mode(0);
     set_color(0);

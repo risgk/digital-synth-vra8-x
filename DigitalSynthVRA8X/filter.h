@@ -8,12 +8,12 @@
 
 template <uint8_t T>
 class Filter {
+  static const uint8_t* m_lpf_table;
   static int16_t        m_x_1;
   static int16_t        m_x_2;
   static int16_t        m_y_1;
   static int16_t        m_y_2;
-  static uint16_t       m_cutoff;
-  static const uint8_t* m_lpf_table;
+  static uint8_t        m_cutoff_base;
   static uint8_t        m_cutoff_eg_depth;
 
   static const uint8_t AUDIO_FRACTION_BITS = 14;
@@ -24,16 +24,16 @@ public:
     m_x_2 = 0;
     m_y_1 = 0;
     m_y_2 = 0;
-    set_cutoff_env(127);
+    set_cutoff(127);
     set_resonance(0);
   }
 
-  INLINE static void set_cutoff_env(uint8_t controller_value) {
+  INLINE static void set_cutoff(uint8_t controller_value) {
     if (controller_value >= 64) {
-      m_cutoff = (controller_value - 64) << 1;
+      m_cutoff_base = (controller_value - 64) << 1;
       m_cutoff_eg_depth = (126 - ((controller_value - 64) << 1)) + 1;
     } else {
-      m_cutoff = 0;
+      m_cutoff_base = 0;
       m_cutoff_eg_depth = (controller_value << 1) + 1;
     }
   }
@@ -49,10 +49,7 @@ public:
   }
 
   INLINE static int16_t clock(int16_t audio_input, uint8_t cutoff_eg_control) {
-    uint8_t cutoff = m_cutoff + high_byte(m_cutoff_eg_depth * cutoff_eg_control);
-    if (cutoff > 127) {
-      cutoff = 127;
-    }
+    uint8_t cutoff = m_cutoff_base + high_byte(m_cutoff_eg_depth * cutoff_eg_control);
 
     const uint8_t* p = m_lpf_table + (cutoff * 3);
     uint8_t b_2_over_a_0_low  = *p++;
@@ -84,10 +81,10 @@ public:
   }
 };
 
+template <uint8_t T> const uint8_t* Filter<T>::m_lpf_table;
 template <uint8_t T> int16_t        Filter<T>::m_x_1;
 template <uint8_t T> int16_t        Filter<T>::m_x_2;
 template <uint8_t T> int16_t        Filter<T>::m_y_1;
 template <uint8_t T> int16_t        Filter<T>::m_y_2;
-template <uint8_t T> uint16_t       Filter<T>::m_cutoff;
-template <uint8_t T> const uint8_t* Filter<T>::m_lpf_table;
+template <uint8_t T> uint8_t        Filter<T>::m_cutoff_base;
 template <uint8_t T> uint8_t        Filter<T>::m_cutoff_eg_depth;
