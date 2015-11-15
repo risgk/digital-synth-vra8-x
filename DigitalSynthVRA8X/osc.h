@@ -163,18 +163,21 @@ public:
       break;
     case OSC_MODE_RM_PWM:
       {
-        m_phase_0 += m_freq;
+        m_phase_0 += (m_freq >> 1);
+        m_phase_1 += (m_freq >> 1) + m_freq;
+        m_phase_2 += (m_freq << 2) + m_freq;
 
-        int8_t harm_s = ((m_color & (1 << 1)) != 0) ? get_triangle_wave_level(0) : 0;
-        int8_t harm_1 =                               get_triangle_wave_level(m_phase_0);
-        int8_t harm_2 = ((m_color & (1 << 2)) != 0) ? get_triangle_wave_level(m_phase_0 << 1) : 0;
-        int8_t harm_3 = ((m_color & (1 << 3)) != 0) ? get_triangle_wave_level(0) : 0;
-        int8_t harm_4 = ((m_color & (1 << 4)) != 0) ? get_triangle_wave_level(m_phase_0 << 2) : 0;
-        int8_t harm_5 = ((m_color & (1 << 5)) != 0) ? get_triangle_wave_level(0) : 0;
-        int8_t harm_6 = ((m_color & (1 << 6)) != 0) ? get_triangle_wave_level(0) : 0;
-        int8_t harm_8 = ((m_color & (1 << 7)) != 0) ? get_triangle_wave_level(m_phase_0 << 3) : 0;
-
-        result = (harm_s + harm_1 + harm_2 + harm_3 + harm_4 + harm_5 + harm_6 + harm_8) << 6;
+        result = 0;
+        result += (m_color & (1 << 0)) ? get_triangle_wave_level(m_phase_0 << 0) : 0;  // 0.5
+        result += (m_color & (1 << 0)) ? get_triangle_wave_level(m_phase_1 << 0) : 0;  // 1.5
+        result +=                        get_triangle_wave_level(m_phase_0 << 1);      // 1
+        result += (m_color & (1 << 1)) ? get_triangle_wave_level(m_phase_0 << 2) : 0;  // 2
+        result += (m_color & (1 << 2)) ? get_triangle_wave_level(m_phase_1 << 1) : 0;  // 3
+        result += (m_color & (1 << 3)) ? get_triangle_wave_level(m_phase_0 << 3) : 0;  // 4
+        result += (m_color & (1 << 4)) ? get_triangle_wave_level(m_phase_2 << 0) : 0;  // 5
+        result += (m_color & (1 << 5)) ? get_triangle_wave_level(m_phase_1 << 2) : 0;  // 6
+        result += (m_color & (1 << 6)) ? get_triangle_wave_level(m_phase_0 << 4) : 0;  // 8
+        result <<= 5;
       }
       break;
     case OSC_MODE_SAW:
