@@ -32,7 +32,10 @@ public:
   }
 
   INLINE static void set_mode(uint8_t controller_value) {
-    uint8_t mode = (static_cast<uint8_t>(controller_value + 8) >> 4) + 1;
+    uint8_t mode = (static_cast<uint8_t>(controller_value + 8) >> 4) << 4;
+    if (mode >= 128) {
+      mode = 127;
+    }
     if (m_mode != mode) {
       m_mode = mode;
       reset_phase();
@@ -127,8 +130,10 @@ public:
         m_phase_1 += freq_detune;
 
         uint8_t fm_ratio = m_mod_rate + 4;
-        int8_t wave_2 = get_wave_level(g_osc_sine_wave_table_h1, (uint16_t) ((m_phase_0 >> 3) * fm_ratio));
-        int8_t wave_3 = get_wave_level(g_osc_sine_wave_table_h1, (uint16_t) ((m_phase_1 >> 3) * fm_ratio));
+        int8_t wave_2 = get_wave_level(g_osc_sine_wave_table_h1,
+                                       (uint16_t) ((m_phase_0 >> 3) * fm_ratio));
+        int8_t wave_3 = get_wave_level(g_osc_sine_wave_table_h1,
+                                       (uint16_t) ((m_phase_1 >> 3) * fm_ratio));
 
         int8_t wave_0 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_0 +
                           ((wave_2 * high_byte((m_mod_depth + 1) * mod_eg_control)) << 3));
@@ -162,13 +167,21 @@ public:
         int16_t shift_lfo = mod_lfo_control * m_mod_depth;
 
         shift_lfo = static_cast<int16_t>(m_color) << 8;
+        int8_t shift_lfo_high = high_sbyte(shift_lfo);
 
         m_phase_0 += m_freq;
 
-        int8_t saw_down = get_wave_level(m_wave_table, m_phase_0);
-        int8_t saw_up   = get_wave_level(m_wave_table, m_phase_0 + (128 << 8) - shift_lfo);
+        int8_t saw_down = get_wave_level(m_wave_table, m_phase_0 + (shift_lfo >> 1));
+        int8_t saw_up   = get_wave_level(m_wave_table, m_phase_0 - (shift_lfo >> 1));
 
-        int16_t mixed = +(saw_down * 127) + -(saw_up * 127);
+        int8_t dc_correction;
+        if (shift_lfo_high == 0) {
+          dc_correction = +32;
+        } else {
+          dc_correction = (shift_lfo_high - 128) >> 2;
+        }
+
+        int16_t mixed = +(saw_down * 127) + -(saw_up * 127) + (dc_correction << 8);
         result = mixed >> 1;
       }
       break;

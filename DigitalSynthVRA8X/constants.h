@@ -44,8 +44,8 @@ const uint8_t   ENV_A          = 22;
 const uint8_t   ENV_D_R        = 23;
 const uint8_t   ALL_NOTES_OFF  = 123;
 
-const uint8_t   OSC_MODE_SAW     = 1;
-const uint8_t   OSC_MODE_RM_PWM  = 3;
-const uint8_t   OSC_MODE_PWM_SAW = 5;
-const uint8_t   OSC_MODE_SYNC_FM = 7;
-const uint8_t   OSC_MODE_FM      = 9;
+const uint8_t   OSC_MODE_SAW     = 0;
+const uint8_t   OSC_MODE_RM_PWM  = 32;
+const uint8_t   OSC_MODE_PWM_SAW = 64;
+const uint8_t   OSC_MODE_SYNC_FM = 96;
+const uint8_t   OSC_MODE_FM      = 127;
