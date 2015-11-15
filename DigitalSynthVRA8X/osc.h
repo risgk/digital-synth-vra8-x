@@ -24,14 +24,7 @@ public:
   INLINE static void initialize() {
     m_freq = 1;
     m_wave_table = g_osc_sine_wave_table_h1;
-    m_phase_lfo = 0;
-    m_phase_0 = 0;
-    m_phase_1 = 0;
-    m_phase_2 = 0;
-    m_phase_3 = 0;
-    m_phase_4 = 0;
-    m_phase_5 = 0;
-    m_mode = 0;
+    reset_phase();
     set_mode(0);
     set_color(0);
     set_mod_rate(0);

@@ -14,7 +14,7 @@ class Filter {
   static int16_t        m_y_2;
   static uint16_t       m_cutoff;
   static const uint8_t* m_lpf_table;
-  static uint8_t        m_cutoff_eg_amt;
+  static uint8_t        m_cutoff_eg_depth;
 
   static const uint8_t AUDIO_FRACTION_BITS = 14;
 
@@ -29,8 +29,13 @@ public:
   }
 
   INLINE static void set_cutoff(uint8_t controller_value) {
-    m_cutoff = controller_value >> 1;
-    m_cutoff_eg_amt = controller_value >> 1;
+    if (controller_value >= 64) {
+      m_cutoff = (controller_value - 64) << 1;
+      m_cutoff_eg_depth = (126 - ((controller_value - 64) << 1)) + 1;
+    } else {
+      m_cutoff = 0;
+      m_cutoff_eg_depth = (controller_value << 1) + 1;
+    }
   }
 
   INLINE static void set_resonance(uint8_t controller_value) {
@@ -44,7 +49,7 @@ public:
   }
 
   INLINE static int16_t clock(int16_t audio_input, uint8_t cutoff_eg_control) {
-    uint8_t cutoff = m_cutoff + high_byte(m_cutoff_eg_amt * cutoff_eg_control);
+    uint8_t cutoff = m_cutoff + high_byte(m_cutoff_eg_depth * cutoff_eg_control);
     if (cutoff > 127) {
       cutoff = 127;
     }
@@ -85,4 +90,4 @@ template <uint8_t T> int16_t        Filter<T>::m_y_1;
 template <uint8_t T> int16_t        Filter<T>::m_y_2;
 template <uint8_t T> uint16_t       Filter<T>::m_cutoff;
 template <uint8_t T> const uint8_t* Filter<T>::m_lpf_table;
-template <uint8_t T> uint8_t        Filter<T>::m_cutoff_eg_amt;
+template <uint8_t T> uint8_t        Filter<T>::m_cutoff_eg_depth;
