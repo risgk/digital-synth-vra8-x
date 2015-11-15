@@ -164,16 +164,20 @@ public:
     case OSC_MODE_RM_PWM:
       {
         uint8_t mod_lfo_control = (triangle_lfo_clock(mod_eg_control, m_mod_rate) + 128) >> 1;
-        int16_t shift_lfo = mod_lfo_control * m_mod_depth;
-        int8_t shift_lfo_high = high_sbyte(shift_lfo);
+        uint16_t shift_lfo = mod_lfo_control * m_mod_depth;
+        uint8_t shift_lfo_high = high_sbyte(shift_lfo);
 
         m_phase_0 += m_freq;
 
+        int8_t saw_main = get_wave_level(m_wave_table, m_phase_0);
         int8_t saw_down = get_wave_level(m_wave_table, m_phase_0 - (shift_lfo >> 1));
         int8_t saw_up   = get_wave_level(m_wave_table, m_phase_0 + (shift_lfo >> 1));
 
-        int8_t dc_correction = (128 - shift_lfo_high) >> 2;
-        int16_t mixed = +(saw_down * 127) + -(saw_up * 127) + (dc_correction << 8);
+        uint8_t dc_correction = (128 - shift_lfo_high) >> 1;
+
+        // Ring Modulation
+        int16_t mixed = (saw_main * (saw_down - saw_up + dc_correction)) << 2;
+
         result = mixed >> 1;
       }
       break;
