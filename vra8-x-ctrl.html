@@ -45,7 +45,7 @@ const MOD_DEPTH     = 19;
 const LPF_CUTOFF    = 20;
 const LPF_RESONANCE = 21;
 const ENV_A         = 22;
-const ENV_D         = 23;
+const ENV_D_R       = 23;
 const ALL_NOTES_OFF = 123;
 
 const CONTROLLERS_FIRST = 16;
@@ -85,7 +85,7 @@ function sleep(msec) {
 
 function soundOff() {
   if (midiOutput) {
-    midiOutput.send([(CONTROL_CHANGE | MIDI_CH), ENV_D        , 0]);
+    midiOutput.send([(CONTROL_CHANGE | MIDI_CH), ENV_D_R      , 0]);
     sleep(2);
     midiOutput.send([(CONTROL_CHANGE | MIDI_CH), ALL_NOTES_OFF, 0]);
     sleep(50);
@@ -200,15 +200,15 @@ function updateDisplayOfControl(number, value) {
     var mode = Math.floor((parseInt(value) + 8) / 16) + 1;
     var str = "";
     switch (mode) {
-    case 1: str = "FM";      break;
+    case 1: str = "SAW";     break;
     case 2: str = "----";    break;
-    case 3: str = "----";    break;
+    case 3: str = "RM+PWM";  break;
     case 4: str = "----";    break;
     case 5: str = "PWM+SAW"; break;
     case 6: str = "----";    break;
     case 7: str = "SYNC+FM"; break;
     case 8: str = "----";    break;
-    case 9: str = "SAW+SAW"; break;
+    case 9: str = "FM";      break;
     }
     document.getElementById("spanCC" + String(number)).innerHTML = value + ": " + str;
   } else {
@@ -228,17 +228,17 @@ function onChangeControlChange(number, value) {
 function preset(number) {
   soundOff();
   var presetControllers = {};
-  presetControllers[OSC_MODE     ] = [0  , 16 , 32 , 48 , 64 , 80 , 96 , 112, 127 ];
-  presetControllers[OSC_COLOR    ] = [8  , 0  , 0  , 0  , 0  , 0  , 8  , 0  , 127 ];
-  presetControllers[MOD_RATE     ] = [8  , 0  , 0  , 0  , 8  , 0  , 8  , 0  , 8   ];
-  presetControllers[MOD_DEPTH    ] = [64 , 0  , 0  , 0  , 127, 0  , 64 , 0  , 127 ];
-  presetControllers[LPF_CUTOFF   ] = [127, 127, 127, 127, 127, 127, 127, 127, 127 ];
-  presetControllers[LPF_RESONANCE] = [127, 0  , 0  , 0  , 127, 0  , 127, 0  , 127 ];
-  presetControllers[ENV_A        ] = [24 , 0  , 0  , 0  , 24 , 0  , 24 , 0  , 24  ];
-  presetControllers[ENV_D        ] = [48 , 127, 127, 127, 48 , 127, 48 , 127, 48  ];
+  presetControllers[OSC_MODE     ] = [0  , 0  , 16 , 32 , 48 , 64 , 80 , 96 , 112, 127 ];
+  presetControllers[OSC_COLOR    ] = [0  , 0  , 0  , 0  , 0  , 8  , 0  , 8  , 0  , 0   ];
+  presetControllers[MOD_RATE     ] = [0  , 8  , 0  , 0  , 0  , 8  , 0  , 8  , 0  , 8   ];
+  presetControllers[MOD_DEPTH    ] = [0  , 127, 0  , 0  , 0  , 64 , 0  , 64 , 0  , 127 ];
+  presetControllers[LPF_CUTOFF   ] = [127, 127, 127, 127, 127, 127, 127, 127, 127, 127 ];
+  presetControllers[LPF_RESONANCE] = [0  , 127, 0  , 0  , 0  , 127, 0  , 127, 0  , 127 ];
+  presetControllers[ENV_A        ] = [0  , 24 , 0  , 0  , 0  , 24 , 0  , 24 , 0  , 24  ];
+  presetControllers[ENV_D_R      ] = [127, 48 , 127, 127, 127, 48 , 127, 48 , 127, 48  ];
 
   for (var i = CONTROLLERS_FIRST; i <= CONTROLLERS_LAST; i++) {
-    onChangeControlChange(i, presetControllers[i][number - 1]);
+    onChangeControlChange(i, presetControllers[i][number]);
   }
 }
 
@@ -324,9 +324,9 @@ function noteOff(noteNumber) {
 &nbsp;
 
 <table>
-<tr><td><input type="button" value="FM"      onclick="preset(1)"         ></td>
+<tr><td><input type="button" value="SAW"     onclick="preset(1)"         ></td>
     <td><input type="button" value="----"    onclick="preset(2)" disabled></td>
-    <td><input type="button" value="----"    onclick="preset(3)"         ></td>
+    <td><input type="button" value="RM+PWM"  onclick="preset(3)"         ></td>
     <td>&nbsp;</td>
     <td><input type="button" value="----"    onclick="preset(4)" disabled></td>
     <td><input type="button" value="PWM+SAW" onclick="preset(5)"         ></td>
@@ -334,30 +334,31 @@ function noteOff(noteNumber) {
     <td>&nbsp;</td>
     <td><input type="button" value="SYNC+FM" onclick="preset(7)"         ></td>
     <td><input type="button" value="----"    onclick="preset(8)" disabled></td>
-    <td><input type="button" value="SAW+SAW" onclick="preset(9)"         ></td></tr>
+    <td><input type="button" value="FM"      onclick="preset(9)"         ></td></tr>
 </table>
 
 <table>
-<tr><td><input type="button" value="Load #0" onclick="loadControllers(0)"></td>
-    <td><input type="button" value="Load #1" onclick="loadControllers(1)"></td>
-    <td><input type="button" value="Load #2" onclick="loadControllers(2)"></td>
-    <td><input type="button" value="Load #3" onclick="loadControllers(3)"></td>
+<tr><td><input type="button" value="LOAD #0" onclick="loadControllers(0)"></td>
+    <td><input type="button" value="LOAD #1" onclick="loadControllers(1)"></td>
+    <td><input type="button" value="LOAD #2" onclick="loadControllers(2)"></td>
+    <td><input type="button" value="LOAD #3" onclick="loadControllers(3)"></td>
     <td>&nbsp;</td>
-    <td><input type="button" value="Save #0" onclick="saveControllers(0)"></td>
-    <td><input type="button" value="Save #1" onclick="saveControllers(1)"></td>
-    <td><input type="button" value="Save #2" onclick="saveControllers(2)"></td>
-    <td><input type="button" value="Save #3" onclick="saveControllers(3)"></td>
+    <td><input type="button" value="SAVE #0" onclick="saveControllers(0)"></td>
+    <td><input type="button" value="SAVE #1" onclick="saveControllers(1)"></td>
+    <td><input type="button" value="SAVE #2" onclick="saveControllers(2)"></td>
+    <td><input type="button" value="SAVE #3" onclick="saveControllers(3)"></td>
     <td>&nbsp;</td>
-    <td><input type="button" value="Random"  onclick="setRandom()"       ></td></tr>
+    <td><input type="button" value="NEUTRAL" onclick="preset(0)"         ></td>
+    <td><input type="button" value="RANDOM"  onclick="setRandom()"       ></td></tr>
 </table>
 
 &nbsp;
 
 <table>
-<tr><td>OSC MODE  </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>OSC COLOR </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>MOD RATE  </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>MOD DEPTH </td></tr>
+<tr><td>OSC MODE     </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>OSC COLOR    </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>MOD RATE     </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>MOD DEPTH    </td></tr>
 <tr><td><input id="inputCC16" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(16, value)"></td><td></td>
     <td><input id="inputCC17" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(17, value)"></td><td></td>
     <td><input id="inputCC18" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(18, value)"></td><td></td>
@@ -367,10 +368,10 @@ function noteOff(noteNumber) {
     <td><span id="spanCC18">-1</span></td><td>&nbsp;</td>
     <td><span id="spanCC19">-1</span></td></tr>
 <tr><td>&nbsp;</td></tr>
-<tr><td>LPF CUTOFF</td><td></td>
-    <td>LPF RESO  </td><td></td>
-    <td>ENV A     </td><td></td>
-    <td>ENV D/R   </td></tr>
+<tr><td>LPF CUTOFF   </td><td></td>
+    <td>LPF RESONANCE</td><td></td>
+    <td>ENV A        </td><td></td>
+    <td>ENV D/R      </td></tr>
 <tr><td><input id="inputCC20" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(20, value)"></td><td></td>
     <td><input id="inputCC21" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(21, value)"></td><td></td>
     <td><input id="inputCC22" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(22, value)"></td><td></td>

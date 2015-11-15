@@ -26,7 +26,7 @@ public:
     m_count = 0;
     m_level = 0;
     set_attack(0);
-    set_decay(0);
+    set_decay_release(0);
   }
 
   INLINE static void set_attack(uint8_t controller_value) {
@@ -34,7 +34,7 @@ public:
       g_eg_attack_rate_table[controller_value >> (7 - EG_CONTROLLER_STEPS_BITS)];
   }
 
-  INLINE static void set_decay(uint8_t controller_value) {
+  INLINE static void set_decay_release(uint8_t controller_value) {
     uint8_t decay_time;
     uint8_t release_time;
 

@@ -30,7 +30,7 @@ def play_cegbdfac(c)
 end
 
 def sound_off
-  control_change(ENV_D        , 0  )
+  control_change(ENV_D_R      , 0  )
   control_change(ALL_NOTES_OFF, 0  )
   wait(800)
 end
@@ -45,7 +45,7 @@ control_change(MOD_DEPTH    , 64 )
 control_change(LPF_CUTOFF   , 127)
 control_change(LPF_RESONANCE, 0  )
 control_change(ENV_A        , 64 )
-control_change(ENV_D        , 64 )
+control_change(ENV_D_R      , 64 )
 play_cegbdfac(3)
 
 sound_off

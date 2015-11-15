@@ -44,8 +44,8 @@ public:
     case ENV_A:
       IEG<0>::set_attack(controller_value);
       break;
-    case ENV_D:
-      IEG<0>::set_decay(controller_value);
+    case ENV_D_R:
+      IEG<0>::set_decay_release(controller_value);
       break;
     }
   }

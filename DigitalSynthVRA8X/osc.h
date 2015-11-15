@@ -74,7 +74,7 @@ public:
         }
       }
       break;
-    case OSC_MODE_SAW_SAW:
+    case OSC_MODE_SAW:
       {
         uint8_t old_low_freq = value_to_low_freq(m_mod_rate);
         uint8_t new_low_freq = value_to_low_freq(controller_value);
@@ -163,7 +163,7 @@ public:
         result = mixed >> 1;
       }
       break;
-    case OSC_MODE_SAW_SAW:
+    case OSC_MODE_SAW:
       {
         uint16_t low_freq = value_to_low_freq(m_mod_rate) + 1;
         uint16_t low_freq_x2 = low_freq << 1;

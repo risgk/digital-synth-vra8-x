@@ -31,7 +31,7 @@ public:
     ISynthCore<0>::control_change(LPF_CUTOFF   , 127);
     ISynthCore<0>::control_change(LPF_RESONANCE, 127);
     ISynthCore<0>::control_change(ENV_A        , 24 );
-    ISynthCore<0>::control_change(ENV_D        , 48 );
+    ISynthCore<0>::control_change(ENV_D_R      , 48 );
   }
 
   INLINE static void receive_midi_byte(uint8_t b) {
