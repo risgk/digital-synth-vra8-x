@@ -143,6 +143,7 @@ function onMIDIMessage(event) {
     var number = event.data[1];
     if (number >= 0 && number <= 7) {
       loadControllers(number);
+      return;
     }
   }
 
