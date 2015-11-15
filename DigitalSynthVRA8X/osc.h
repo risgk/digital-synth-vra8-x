@@ -156,6 +156,22 @@ public:
         result = mixed >> 1;
       }
       break;
+    case OSC_MODE_RM_PWM:
+      {
+        int8_t mod_lfo_control = triangle_lfo_clock(mod_eg_control, m_mod_rate);
+        int16_t shift_lfo = mod_lfo_control * m_mod_depth;
+
+        shift_lfo = static_cast<int16_t>(m_color) << 8;
+
+        m_phase_0 += m_freq;
+
+        int8_t saw_down = get_wave_level(m_wave_table, m_phase_0);
+        int8_t saw_up   = get_wave_level(m_wave_table, m_phase_0 + (128 << 8) - shift_lfo);
+
+        int16_t mixed = +(saw_down * 127) + -(saw_up * 127);
+        result = mixed >> 1;
+      }
+      break;
     case OSC_MODE_SAW:
       {
         uint16_t low_freq = value_to_low_freq(m_mod_rate) + 1;
