@@ -161,7 +161,7 @@ public:
         result = mixed >> 1;
       }
       break;
-    case OSC_MODE_RM_PWM:
+    case OSC_MODE_ORGAN:
       {
         m_phase_0 += (m_freq >> 1);
         m_phase_1 += (m_freq >> 1) + m_freq;
