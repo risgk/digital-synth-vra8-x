@@ -24,11 +24,11 @@ public:
     m_x_2 = 0;
     m_y_1 = 0;
     m_y_2 = 0;
-    set_cutoff(127);
+    set_cutoff_env(127);
     set_resonance(0);
   }
 
-  INLINE static void set_cutoff(uint8_t controller_value) {
+  INLINE static void set_cutoff_env(uint8_t controller_value) {
     if (controller_value >= 64) {
       m_cutoff = (controller_value - 64) << 1;
       m_cutoff_eg_depth = (126 - ((controller_value - 64) << 1)) + 1;

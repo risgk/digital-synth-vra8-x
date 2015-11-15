@@ -38,14 +38,14 @@ end
 sound_off
 
 # Preset Lead
-control_change(OSC_MODE     , 0  );
-control_change(OSC_COLOR    , 0  );
-control_change(MOD_RATE     , 8  );
-control_change(MOD_DEPTH    , 96 );
-control_change(LPF_CUTOFF   , 64 );
-control_change(LPF_RESONANCE, 127);
-control_change(ENV_A        , 24 );
-control_change(ENV_D_R      , 48 );
+control_change(OSC_MODE      , 0  );
+control_change(OSC_COLOR     , 0  );
+control_change(MOD_RATE      , 8  );
+control_change(MOD_DEPTH     , 96 );
+control_change(LPF_CUTOFF_ENV, 64 );
+control_change(LPF_RESONANCE , 127);
+control_change(ENV_A         , 24 );
+control_change(ENV_D_R       , 48 );
 play_cegbdfac(3)
 
 sound_off

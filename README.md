@@ -1,18 +1,18 @@
 # Digital Synth VRA8-X 0.0.0
 
-- 20**-**-** ISGK Instruments
+- 2015-11-** ISGK Instruments
 - <https://github.com/risgk/digital-synth-vra8-x>
 
 ## Concept
 
-- Digital Synthesizer (MIDI Sound Module) for Arduino Uno
+- Experimental Synthesizer (MIDI Sound Module) for Arduino Uno
 
 ## Features
 
 - Sketch for Arduino Uno
 - Serial MIDI In (38400 bps), PWM Audio Out (Pin 6), PWM Rate: 62500 Hz
 - Sampling Rate: 15625 Hz, Bit Depth: 8 bits
-- VCF Type (Attenuation Slope): LPF (-12 dB/oct)
+- LPF Attenuation Slope: -12 dB/oct
 - Recommending [Hairless MIDI<->Serial Bridge](http://projectgus.github.io/hairless-midiserial/) to connect PC
 - Files
     - `DigitalSynthVRA8X/DigitalSynthVRA8X.ino` is for Arduino Uno
@@ -68,7 +68,7 @@
 
 ## MIDI Implementation Chart
 
-      [Monophonic Synthesizer]                                        Date: 20**-**-**       
+      [Monophonic Synthesizer]                                        Date: 2015-11-**       
       Model  Digital Synth VRA8-X     MIDI Implementation Chart       Version: 0.0.0         
     +-------------------------------+---------------+---------------+-----------------------+
     | Function...                   | Transmitted   | Recognized    | Remarks               |

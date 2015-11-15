@@ -34,15 +34,15 @@ EOX                   = 0xF7
 REAL_TIME_MESSAGE_MIN = 0xF8
 ACTIVE_SENSING        = 0xFE
 
-OSC_MODE      = 16
-OSC_COLOR     = 17
-MOD_RATE      = 18
-MOD_DEPTH     = 19
-LPF_CUTOFF    = 20
-LPF_RESONANCE = 21
-ENV_A         = 22
-ENV_D_R       = 23
-ALL_NOTES_OFF = 123
+OSC_MODE       = 16
+OSC_COLOR      = 17
+MOD_RATE       = 18
+MOD_DEPTH      = 19
+LPF_CUTOFF_ENV = 20
+LPF_RESONANCE  = 21
+ENV_A          = 22
+ENV_D_R        = 23
+ALL_NOTES_OFF  = 123
 
 OSC_MODE_SAW     = 1
 OSC_MODE_RM_PWM  = 5

@@ -34,15 +34,15 @@ const uint8_t   EOX                   = 0xF7;
 const uint8_t   REAL_TIME_MESSAGE_MIN = 0xF8;
 const uint8_t   ACTIVE_SENSING        = 0xFE;
 
-const uint8_t   OSC_MODE      = 16;
-const uint8_t   OSC_COLOR     = 17;
-const uint8_t   MOD_RATE      = 18;
-const uint8_t   MOD_DEPTH     = 19;
-const uint8_t   LPF_CUTOFF    = 20;
-const uint8_t   LPF_RESONANCE = 21;
-const uint8_t   ENV_A         = 22;
-const uint8_t   ENV_D_R       = 23;
-const uint8_t   ALL_NOTES_OFF = 123;
+const uint8_t   OSC_MODE       = 16;
+const uint8_t   OSC_COLOR      = 17;
+const uint8_t   MOD_RATE       = 18;
+const uint8_t   MOD_DEPTH      = 19;
+const uint8_t   LPF_CUTOFF_ENV = 20;
+const uint8_t   LPF_RESONANCE  = 21;
+const uint8_t   ENV_A          = 22;
+const uint8_t   ENV_D_R        = 23;
+const uint8_t   ALL_NOTES_OFF  = 123;
 
 const uint8_t   OSC_MODE_SAW     = 1;
 const uint8_t   OSC_MODE_RM_PWM  = 5;

@@ -38,15 +38,15 @@ const NOTE_OFF       = 0x80;
 const NOTE_ON        = 0x90;
 const CONTROL_CHANGE = 0xB0;
 
-const OSC_MODE      = 16;
-const OSC_COLOR     = 17;
-const MOD_RATE      = 18;
-const MOD_DEPTH     = 19;
-const LPF_CUTOFF    = 20;
-const LPF_RESONANCE = 21;
-const ENV_A         = 22;
-const ENV_D_R       = 23;
-const ALL_NOTES_OFF = 123;
+const OSC_MODE       = 16;
+const OSC_COLOR      = 17;
+const MOD_RATE       = 18;
+const MOD_DEPTH      = 19;
+const LPF_CUTOFF_ENV = 20;
+const LPF_RESONANCE  = 21;
+const ENV_A          = 22;
+const ENV_D_R        = 23;
+const ALL_NOTES_OFF  = 123;
 
 const CONTROLLERS_FIRST = 16;
 const CONTROLLERS_LAST  = 23;
@@ -210,7 +210,7 @@ function updateDisplayOfControl(number, value) {
     case 8: str = "----";    break;
     case 9: str = "FM";      break;
     }
-    document.getElementById("spanCC" + String(number)).innerHTML = value + ": " + str;
+    document.getElementById("spanCC" + String(number)).innerHTML = value + " (" + str + ")";
   } else {
     document.getElementById("spanCC" + String(number)).innerHTML = value;
   }
@@ -228,14 +228,14 @@ function onChangeControlChange(number, value) {
 function preset(number) {
   soundOff();
   var presetControllers = {};
-  presetControllers[OSC_MODE     ] = [0  , 0  , 16 , 32 , 48 , 64 , 80 , 96 , 112, 127 ];
-  presetControllers[OSC_COLOR    ] = [0  , 0  , 0  , 0  , 0  , 8  , 0  , 8  , 0  , 0   ];
-  presetControllers[MOD_RATE     ] = [0  , 8  , 0  , 0  , 0  , 8  , 0  , 8  , 0  , 8   ];
-  presetControllers[MOD_DEPTH    ] = [0  , 96 , 0  , 0  , 0  , 64 , 0  , 64 , 0  , 127 ];
-  presetControllers[LPF_CUTOFF   ] = [64 , 64 , 64 , 64 , 64 , 64 , 64 , 64 , 64 , 64  ];
-  presetControllers[LPF_RESONANCE] = [0  , 127, 0  , 0  , 0  , 127, 0  , 127, 0  , 127 ];
-  presetControllers[ENV_A        ] = [0  , 24 , 24 , 24 , 24 , 24 , 24 , 24 , 24 , 24  ];
-  presetControllers[ENV_D_R      ] = [127, 48 , 48 , 48 , 48 , 48 , 48 , 48 , 48 , 48  ];
+  presetControllers[OSC_MODE      ] = [0  , 0  , 16 , 32 , 48 , 64 , 80 , 96 , 112, 127 ];
+  presetControllers[OSC_COLOR     ] = [0  , 0  , 0  , 0  , 0  , 0  , 0  , 8  , 0  , 8   ];
+  presetControllers[MOD_RATE      ] = [0  , 8  , 0  , 0  , 0  , 8  , 0  , 8  , 0  , 8   ];
+  presetControllers[MOD_DEPTH     ] = [0  , 96 , 0  , 0  , 0  , 127, 0  , 64 , 0  , 64  ];
+  presetControllers[LPF_CUTOFF_ENV] = [127, 64 , 64 , 64 , 64 , 64 , 64 , 64 , 64 , 64  ];
+  presetControllers[LPF_RESONANCE ] = [0  , 127, 0  , 0  , 0  , 127, 0  , 127, 0  , 127 ];
+  presetControllers[ENV_A         ] = [0  , 24 , 24 , 24 , 24 , 24 , 24 , 24 , 24 , 24  ];
+  presetControllers[ENV_D_R       ] = [127, 48 , 48 , 48 , 48 , 48 , 48 , 48 , 48 , 48  ];
 
   for (var i = CONTROLLERS_FIRST; i <= CONTROLLERS_LAST; i++) {
     onChangeControlChange(i, presetControllers[i][number]);
@@ -246,10 +246,9 @@ function setRandom() {
   soundOff();
   for (var i = CONTROLLERS_FIRST; i <= CONTROLLERS_LAST; i++) {
     if (i == OSC_MODE) {
-      var v = rand(3) * 32;
-      if (v > 127) {
-        v = 127;
-      }
+      var r = rand(5);
+      a = [0, 32, 64, 96, 127];
+      v = a[r];
       onChangeControlChange(i, v);
     } else {
       onChangeControlChange(i, rand(128));
@@ -355,10 +354,10 @@ function noteOff(noteNumber) {
 &nbsp;
 
 <table>
-<tr><td>OSC MODE     </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>OSC COLOR    </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>MOD RATE     </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-    <td>MOD DEPTH    </td></tr>
+<tr><td>OSC MODE      </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>OSC COLOR     </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>MOD RATE      </td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>MOD DEPTH     </td></tr>
 <tr><td><input id="inputCC16" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(16, value)"></td><td></td>
     <td><input id="inputCC17" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(17, value)"></td><td></td>
     <td><input id="inputCC18" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(18, value)"></td><td></td>
@@ -368,10 +367,10 @@ function noteOff(noteNumber) {
     <td><span id="spanCC18">-1</span></td><td>&nbsp;</td>
     <td><span id="spanCC19">-1</span></td></tr>
 <tr><td>&nbsp;</td></tr>
-<tr><td>LPF CUTOFF   </td><td></td>
-    <td>LPF RESONANCE</td><td></td>
-    <td>ENV A        </td><td></td>
-    <td>ENV D/R      </td></tr>
+<tr><td>LPF CUTOFF/ENV</td><td></td>
+    <td>LPF RESONANCE </td><td></td>
+    <td>ENV A         </td><td></td>
+    <td>ENV D/R       </td></tr>
 <tr><td><input id="inputCC20" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(20, value)"></td><td></td>
     <td><input id="inputCC21" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(21, value)"></td><td></td>
     <td><input id="inputCC22" type="range" min="0" max="127" step="1" oninput="onChangeControlChange(22, value)"></td><td></td>
