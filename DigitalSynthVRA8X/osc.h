@@ -167,17 +167,29 @@ public:
         m_phase_1 += (m_freq >> 1) + m_freq;
         m_phase_2 += (m_freq << 2) + m_freq;
 
+        uint8_t c = 0;
         result = 0;
-        result += (m_color & (1 << 0)) ? get_triangle_wave_level(m_phase_0 << 0) : 0;  // 0.5
-        result += (m_color & (1 << 0)) ? get_triangle_wave_level(m_phase_1 << 0) : 0;  // 1.5
-        result +=                        get_triangle_wave_level(m_phase_0 << 1);      // 1
-        result += (m_color & (1 << 1)) ? get_triangle_wave_level(m_phase_0 << 2) : 0;  // 2
-        result += (m_color & (1 << 2)) ? get_triangle_wave_level(m_phase_1 << 1) : 0;  // 3
-        result += (m_color & (1 << 3)) ? get_triangle_wave_level(m_phase_0 << 3) : 0;  // 4
-        result += (m_color & (1 << 4)) ? get_triangle_wave_level(m_phase_2 << 0) : 0;  // 5
-        result += (m_color & (1 << 5)) ? get_triangle_wave_level(m_phase_1 << 2) : 0;  // 6
-        result += (m_color & (1 << 6)) ? get_triangle_wave_level(m_phase_0 << 4) : 0;  // 8
-        result <<= 5;
+        result += (m_color & (1 << 0)) ? (c++, get_triangle_wave_level(m_phase_0 << 0)) : 0;  // 0.5
+        result += (m_color & (1 << 0)) ? (c++, get_triangle_wave_level(m_phase_1 << 0)) : 0;  // 1.5
+        result +=                        (c++, get_triangle_wave_level(m_phase_0 << 1))    ;  // 1
+        result += (m_color & (1 << 1)) ? (c++, get_triangle_wave_level(m_phase_0 << 2)) : 0;  // 2
+        result += (m_color & (1 << 2)) ? (c++, get_triangle_wave_level(m_phase_1 << 1)) : 0;  // 3
+        result += (m_color & (1 << 3)) ? (c++, get_triangle_wave_level(m_phase_0 << 3)) : 0;  // 4
+        result += (m_color & (1 << 4)) ? (c++, get_triangle_wave_level(m_phase_2 << 0)) : 0;  // 5
+        result += (m_color & (1 << 5)) ? (c++, get_triangle_wave_level(m_phase_1 << 2)) : 0;  // 6
+        result += (m_color & (1 << 6)) ? (c++, get_triangle_wave_level(m_phase_0 << 4)) : 0;  // 8
+
+        switch (c) {
+        case 1: result *= 252; break;
+        case 2: result *= 126; break;
+        case 3: result *= 84;  break;
+        case 4: result *= 63;  break;
+        case 5: result *= 50;  break;
+        case 6: result *= 42;  break;
+        case 7: result *= 36;  break;
+        case 8: result *= 32;  break;
+        case 9: result *= 28;  break;
+        }
       }
       break;
     case OSC_MODE_SAW:
