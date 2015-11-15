@@ -178,6 +178,12 @@ public:
                                         (wave_3 * (d >> 1)) + (wave_4 * (r >> 1));
       }
       break;
+    default:
+      {
+        m_phase_0 += m_freq;
+        result = get_wave_level(g_osc_sine_wave_table_h1, m_phase_0) * 127;
+      }
+      break;
     }
 
     return result;
