@@ -45,7 +45,6 @@ public:
   INLINE static void set_color(uint8_t controller_value) {
     switch (m_mode) {
     case OSC_MODE_FM:
-    case OSC_MODE_SYNC_FM:
       {
         uint8_t old_low_freq = value_to_low_freq(m_color);
         uint8_t new_low_freq = value_to_low_freq(controller_value);
@@ -99,7 +98,7 @@ public:
     switch (m_mode) {
     case OSC_MODE_FM:
       {
-        uint16_t freq_detune = m_freq - value_to_low_freq(m_color);
+        uint16_t freq_detune = m_freq - ((value_to_low_freq(m_color) >> 1) << 1);
 
         uint8_t fm_ratio = mod_rate_to_fm_ratio(m_mod_rate);
         uint16_t mod_freq = (m_freq >> 1) * fm_ratio;
@@ -123,28 +122,14 @@ public:
         result = mixed >> 1;
       }
       break;
-    case OSC_MODE_SYNC_FM:
+    case OSC_MODE_BINARY:
       {
-        uint16_t freq_detune = m_freq - value_to_low_freq(m_color);
+        // TODO
         m_phase_0 += m_freq;
-        m_phase_1 += freq_detune;
-
-        uint8_t fm_ratio = m_mod_rate + 4;
-        int8_t wave_2 = get_wave_level(g_osc_sine_wave_table_h1,
-                                       (uint16_t) ((m_phase_0 >> 3) * fm_ratio));
-        int8_t wave_3 = get_wave_level(g_osc_sine_wave_table_h1,
-                                       (uint16_t) ((m_phase_1 >> 3) * fm_ratio));
-
-        int8_t wave_0 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_0 +
-                          ((wave_2 * high_byte((m_mod_depth + 1) * mod_eg_control)) << 3));
-        int8_t wave_1 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_1 +
-                          ((wave_3 * high_byte((m_mod_depth + 1) * mod_eg_control)) << 3));
-
-        int16_t mixed = wave_0 * 170 + wave_1 * 85;
-        result = mixed >> 1;
+        result = get_wave_level(g_osc_sine_wave_table_h1, m_phase_0) * 127;
       }
       break;
-    case OSC_MODE_PWM_SAW:
+    case OSC_MODE_PULSE_SAW:
       {
         int8_t mod_lfo_control = triangle_lfo_clock(mod_eg_control, m_mod_rate);
         int16_t shift_lfo = mod_lfo_control * m_mod_depth;
@@ -163,33 +148,13 @@ public:
       break;
     case OSC_MODE_ORGAN:
       {
-        m_phase_0 += (m_freq >> 1);
-        m_phase_1 += (m_freq >> 1) + m_freq;
-        m_phase_2 += (m_freq << 2) + m_freq;
+        int8_t mod_lfo_control = triangle_lfo_clock(mod_eg_control, m_mod_rate);
+        int16_t freq = m_freq + high_sbyte(mod_lfo_control * m_mod_depth);
 
-        uint8_t c = 0;
-        result = 0;
-        result += (m_color & (1 << 0)) ? (c++, get_triangle_wave_level(m_phase_0 << 0)) : 0;  // 0.5
-        result += (m_color & (1 << 0)) ? (c++, get_triangle_wave_level(m_phase_1 << 0)) : 0;  // 1.5
-        result +=                        (c++, get_triangle_wave_level(m_phase_0 << 1))    ;  // 1
-        result += (m_color & (1 << 1)) ? (c++, get_triangle_wave_level(m_phase_0 << 2)) : 0;  // 2
-        result += (m_color & (1 << 2)) ? (c++, get_triangle_wave_level(m_phase_1 << 1)) : 0;  // 3
-        result += (m_color & (1 << 3)) ? (c++, get_triangle_wave_level(m_phase_0 << 3)) : 0;  // 4
-        result += (m_color & (1 << 4)) ? (c++, get_triangle_wave_level(m_phase_2 << 0)) : 0;  // 5
-        result += (m_color & (1 << 5)) ? (c++, get_triangle_wave_level(m_phase_1 << 2)) : 0;  // 6
-        result += (m_color & (1 << 6)) ? (c++, get_triangle_wave_level(m_phase_0 << 4)) : 0;  // 8
-
-        switch (c) {
-        case 1: result *= 252; break;
-        case 2: result *= 126; break;
-        case 3: result *= 84;  break;
-        case 4: result *= 63;  break;
-        case 5: result *= 50;  break;
-        case 6: result *= 42;  break;
-        case 7: result *= 36;  break;
-        case 8: result *= 32;  break;
-        case 9: result *= 28;  break;
-        }
+        m_phase_0 += (freq >> 1);
+        m_phase_1 += (freq >> 1) + freq;
+        m_phase_2 += (freq << 2) + freq;
+        result = get_organ_level(m_color, m_phase_0, m_phase_1, m_phase_2);
       }
       break;
     case OSC_MODE_SAW:
@@ -253,6 +218,36 @@ private:
     }
     level -= 0x4000;
     return high_sbyte((high_sbyte(level << 1) + 1) * mod_eg_control);
+  }
+
+
+  INLINE static int16_t get_organ_level(uint8_t color, uint16_t phase_0,
+                                                       uint16_t phase_1_5, uint16_t phase_5) {
+    uint8_t c = 0;
+    int16_t result = 0;
+    result += (color & (1 << 0)) ? (c++, get_triangle_wave_level(phase_0   << 0)) : 0;  // 0.5
+    result += (color & (1 << 0)) ? (c++, get_triangle_wave_level(phase_1_5 << 0)) : 0;  // 1.5
+    result +=                      (c++, get_triangle_wave_level(phase_0   << 1))    ;  // 1
+    result += (color & (1 << 1)) ? (c++, get_triangle_wave_level(phase_0   << 2)) : 0;  // 2
+    result += (color & (1 << 2)) ? (c++, get_triangle_wave_level(phase_1_5 << 1)) : 0;  // 3
+    result += (color & (1 << 3)) ? (c++, get_triangle_wave_level(phase_0   << 3)) : 0;  // 4
+    result += (color & (1 << 4)) ? (c++, get_triangle_wave_level(phase_5   << 0)) : 0;  // 5
+    result += (color & (1 << 5)) ? (c++, get_triangle_wave_level(phase_1_5 << 2)) : 0;  // 6
+    result += (color & (1 << 6)) ? (c++, get_triangle_wave_level(phase_0   << 4)) : 0;  // 8
+
+    switch (c) {
+    case 1: result *= 252; break;
+    case 2: result *= 126; break;
+    case 3: result *= 84;  break;
+    case 4: result *= 63;  break;
+    case 5: result *= 50;  break;
+    case 6: result *= 42;  break;
+    case 7: result *= 36;  break;
+    case 8: result *= 32;  break;
+    case 9: result *= 28;  break;
+    }
+
+    return result;
   }
 
   INLINE static int8_t get_triangle_wave_level(uint16_t phase) {
