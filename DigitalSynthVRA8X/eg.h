@@ -88,11 +88,11 @@ public:
         m_count--;
         if (m_count == 0) {
           m_count = m_decay_update_interval;
-          if (m_level <= (EG_LEVEL_MAX >> 10)) {
+          if (m_level < 256) {
             m_state = STATE_IDLE;
             m_level = 0;
           } else {
-            m_level = mul_q16_q8(m_level, m_decay_rate);
+            m_level -= high_byte(m_level) * static_cast<uint8_t>(-m_decay_rate);
           }
         }
       }
@@ -101,11 +101,11 @@ public:
       m_count--;
       if (m_count == 0) {
         m_count = m_release_update_interval;
-        if (m_level <= (EG_LEVEL_MAX >> 10)) {
+        if (m_level < 256) {
           m_state = STATE_IDLE;
           m_level = 0;
         } else {
-          m_level = mul_q16_q8(m_level, m_release_rate);
+          m_level -= high_byte(m_level) * static_cast<uint8_t>(-m_release_rate);
         }
       }
       break;
