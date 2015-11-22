@@ -251,7 +251,7 @@ private:
   }
 
   INLINE static int8_t get_triangle_wave_level(uint16_t phase) {
-    uint8_t level = high_byte(phase + 0x4000);
+    uint8_t level = high_byte(phase) + 0x40;
     if ((level & 0x80) != 0) {
       level = ~level;
     }

@@ -1,10 +1,10 @@
 #pragma once
 
-const uint8_t EG_ATTACK_UPDATE_INTERVAL = 2;
+const uint8_t EG_ATTACK_UPDATE_INTERVAL = 4;
 
 const uint16_t g_eg_attack_rate_table[] = {
-   2000,  2000,  1588,  1261,  1002,   796,   632,   502,   399,   316,   251,   200,   158,   126,   100,    79,
-     63,    50,    39,    31,    25,    20,    15,    12,    10,     7,     6,     5,     3,     3,     2,     2,
+   4000,  4000,  3177,  2523,  2004,  1592,  1264,  1004,   798,   633,   503,   400,   317,   252,   200,   159,
+    126,   100,    79,    63,    50,    40,    31,    25,    20,    15,    12,    10,     7,     6,     5,     4,
   };
 
 const uint8_t g_eg_decay_release_rate_table[] = {

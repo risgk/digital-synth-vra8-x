@@ -4,7 +4,7 @@ $file = File.open("eg-table.h", "w")
 
 $file.printf("#pragma once\n\n")
 
-EG_ATTACK_UPDATE_INTERVAL = 2
+EG_ATTACK_UPDATE_INTERVAL = 4
 $file.printf("const uint8_t EG_ATTACK_UPDATE_INTERVAL = %d;\n", EG_ATTACK_UPDATE_INTERVAL)
 $file.printf("\n")
 
