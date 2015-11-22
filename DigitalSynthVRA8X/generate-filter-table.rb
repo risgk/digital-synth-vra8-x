@@ -40,6 +40,6 @@ end
 
 generate_filter_lpf_table("q_4", 4.0)
 generate_filter_lpf_table("q_2", 2.0)
-generate_filter_lpf_table("q_1", 1.0)
+generate_filter_lpf_table("q_sqrt_2", Math.sqrt(2))
 
 $file.close

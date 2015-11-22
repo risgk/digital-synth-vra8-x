@@ -44,7 +44,7 @@ public:
     } else if (controller_value >= 32) {
       m_lpf_table = g_filter_lpf_table_q_2;
     } else {
-      m_lpf_table = g_filter_lpf_table_q_1;
+      m_lpf_table = g_filter_lpf_table_q_sqrt_2;
     }
   }
 
