@@ -132,8 +132,8 @@ public:
 
         uint8_t curr_index = high_byte(m_phase_0) >> 4;
         uint8_t next_index = static_cast<uint8_t>(high_byte(m_phase_0) + 16) >> 4;
-        int8_t curr_data = (nth_bit(m_param_binary, curr_index >> 1) != 0) ? 31 : -32;
-        int8_t next_data = (nth_bit(m_param_binary, next_index >> 1) != 0) ? 31 : -32;
+        int8_t curr_data = (nth_bit(m_param_binary, curr_index >> 1) != 0) ? 24 : -24;
+        int8_t next_data = (nth_bit(m_param_binary, next_index >> 1) != 0) ? 24 : -24;
         uint8_t next_weight = (m_phase_0 >> 4) & 0xFF;
         result = (curr_data << 8) +
                  (static_cast<int8_t>(next_data - curr_data) * next_weight) ;
