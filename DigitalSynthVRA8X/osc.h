@@ -96,9 +96,9 @@ public:
       {
         uint8_t low_freq = (value_to_low_freq(m_color) >> 1) << 1;
         uint16_t freq_detune = m_freq - low_freq;
-//        if (low_freq != 0) {
-  //        freq_detune = -(m_rnd_bit << 1);
-    //    }
+        if (low_freq != 0) {
+          freq_detune -= m_rnd_bit << 1;
+        }
 
         uint8_t fm_ratio = mod_rate_to_fm_ratio(m_mod_rate);
         uint16_t mod_freq = (m_freq >> 1) * fm_ratio;
