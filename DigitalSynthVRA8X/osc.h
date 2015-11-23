@@ -12,11 +12,12 @@ class Osc {
   static uint16_t       m_phase_1;
   static uint16_t       m_phase_2;
   static uint16_t       m_phase_3;
+  static uint16_t       m_phase_4;
   static uint8_t        m_mode;
   static uint8_t        m_color;
   static uint16_t       m_mod_rate;
   static uint16_t       m_mod_depth;
-  static uint16_t       m_rnd_reg;
+  static uint8_t        m_rnd_reg;
   static uint8_t        m_rnd_bit;
   static uint16_t       m_rnd_cnt;
 
@@ -52,13 +53,6 @@ public:
         uint8_t old_low_freq = (value_to_low_freq(m_color) >> 1) << 1;
         uint8_t new_low_freq = (value_to_low_freq(controller_value) >> 1) << 1;
         if (old_low_freq != 0 && new_low_freq == 0) {
-          reset_phase();
-        }
-      }
-      break;
-    case OSC_MODE_ORGAN:
-      {
-        if (m_color != 0 && controller_value == 0) {
           reset_phase();
         }
       }
@@ -162,20 +156,23 @@ public:
       {
         uint16_t low_freq = value_to_low_freq(m_mod_rate) + 2;
         uint16_t low_freq_x2 = low_freq << 1;
-        uint8_t b = rnd_bit();
+        uint8_t b = rnd();
         m_phase_0 += m_freq + b;
-        m_phase_1 += m_freq - low_freq;
+        m_phase_1 += m_freq - low_freq - b;
         m_phase_2 += m_freq + low_freq;
-        m_phase_3 += m_freq - low_freq_x2 - b;
+        m_phase_3 += m_freq - low_freq_x2 + b;
+        m_phase_4 += m_freq + low_freq_x2 - b;
 
         int8_t wave_0 = get_wave_level(m_wave_table, m_phase_0);
         int8_t wave_1 = get_wave_level(m_wave_table, m_phase_1);
         int8_t wave_2 = get_wave_level(m_wave_table, m_phase_2);
         int8_t wave_3 = get_wave_level(m_wave_table, m_phase_3);
+        int8_t wave_4 = get_wave_level(m_wave_table, m_phase_4);
 
         int8_t d = m_mod_depth >> 2;
         int8_t r = (m_color < 64) ? d : -d;
-        result = (wave_0 * (126 - d)) + (wave_1 * r) + (wave_2 * r) + (wave_3 * d);
+        result = (wave_0 * (126 - d)) + (wave_1 * r)        + (wave_2 * d) +
+                                        (wave_3 * (d >> 1)) + (wave_4 * (r >> 1));
       }
       break;
     default:
@@ -195,6 +192,7 @@ private:
     m_phase_1 = 0;
     m_phase_2 = 0;
     m_phase_3 = 0;
+    m_phase_4 = 0;
   }
 
   INLINE static uint8_t value_to_low_freq(uint8_t value) {
@@ -206,8 +204,8 @@ private:
   }
 
   INLINE static int8_t triangle_lfo_clock(uint8_t mod_eg_control, uint8_t mod_rate) {
-    m_phase_3 += value_to_low_freq(mod_rate) + 1;
-    uint16_t level = m_phase_3;
+    m_phase_4 += value_to_low_freq(mod_rate) + 1;
+    uint16_t level = m_phase_4;
     if ((level & 0x8000) != 0) {
       level = ~level;
     }
@@ -262,17 +260,17 @@ private:
     uint8_t next_weight = low_byte(phase);
 
     // lerp
-    int8_t level = curr_data + high_sbyte((next_data - curr_data) * next_weight);
+    int8_t level = curr_data +
+                   high_sbyte(static_cast<int8_t>(next_data - curr_data) * next_weight);
 
     return level;
   }
 
-  INLINE static uint8_t rnd_bit() {
+  INLINE static uint8_t rnd() {
     m_rnd_cnt++;
     if (high_byte(m_rnd_cnt) >= 0x08) {
       m_rnd_cnt = 0;
-      m_rnd_bit = ((low_byte(m_rnd_reg) >> 1) ^
-                  (low_byte(m_rnd_reg) >> 2)) & 0x01;
+      m_rnd_bit = ((m_rnd_reg >> 1) ^ (m_rnd_reg >> 2)) & 1;
       m_rnd_reg = (m_rnd_reg >> 1) | (m_rnd_bit << 7);
     }
     return m_rnd_bit;
@@ -285,10 +283,11 @@ template <uint8_t T> uint16_t        Osc<T>::m_phase_0;
 template <uint8_t T> uint16_t        Osc<T>::m_phase_1;
 template <uint8_t T> uint16_t        Osc<T>::m_phase_2;
 template <uint8_t T> uint16_t        Osc<T>::m_phase_3;
+template <uint8_t T> uint16_t        Osc<T>::m_phase_4;
 template <uint8_t T> uint8_t         Osc<T>::m_mode;
 template <uint8_t T> uint8_t         Osc<T>::m_color;
 template <uint8_t T> uint16_t        Osc<T>::m_mod_rate;
 template <uint8_t T> uint16_t        Osc<T>::m_mod_depth;
-template <uint8_t T> uint16_t        Osc<T>::m_rnd_reg;
+template <uint8_t T> uint8_t         Osc<T>::m_rnd_reg;
 template <uint8_t T> uint8_t         Osc<T>::m_rnd_bit;
 template <uint8_t T> uint16_t        Osc<T>::m_rnd_cnt;
