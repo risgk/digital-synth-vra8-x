@@ -20,6 +20,7 @@ class Osc {
   static uint16_t       m_rnd_reg;
   static uint8_t        m_rnd_bit;
   static uint16_t       m_rnd_cnt;
+  static uint8_t        m_param_binary;
 
 public:
   INLINE static void initialize() {
@@ -33,6 +34,7 @@ public:
     m_rnd_reg = ~0;
     m_rnd_bit = 0;
     m_rnd_cnt = 0;
+    m_param_binary = m_color;
   }
 
   INLINE static void set_mode(uint8_t controller_value) {
@@ -119,9 +121,19 @@ public:
       break;
     case OSC_MODE_BINARY:
       {
-        // TODO
+        uint16_t phase_0_old = m_phase_0;
         m_phase_0 += m_freq;
-        result = get_wave_level(g_osc_sine_wave_table_h1, m_phase_0) * 127;
+        if (m_phase_0 < phase_0_old) {
+          m_param_binary = (m_color == 0) ? 1 : m_color;
+        }
+
+        uint8_t curr_index = high_byte(m_phase_0) >> 4;
+        uint8_t next_index = static_cast<uint8_t>(high_byte(m_phase_0) + 16) >> 4;
+        int8_t curr_data = (nth_bit(m_param_binary, curr_index >> 1) != 0) ? 31 : -31;
+        int8_t next_data = (nth_bit(m_param_binary, next_index >> 1) != 0) ? 31 : -31;
+        uint8_t next_weight = (m_phase_0 >> 4) & 0xFF;
+        result = (curr_data << 8) +
+                 (static_cast<int8_t>(next_data - curr_data) * next_weight);
       }
       break;
     case OSC_MODE_PULSE_SAW:
@@ -266,6 +278,10 @@ private:
     return level;
   }
 
+  INLINE static uint8_t nth_bit(uint8_t byte, uint8_t n) {
+    return (byte >> n) & 1;
+  }
+
   INLINE static uint8_t rnd() {
     m_rnd_cnt++;
     if (high_byte(m_rnd_cnt) >= 0x08) {
@@ -292,3 +308,4 @@ template <uint8_t T> uint16_t        Osc<T>::m_mod_depth;
 template <uint8_t T> uint16_t        Osc<T>::m_rnd_reg;
 template <uint8_t T> uint8_t         Osc<T>::m_rnd_bit;
 template <uint8_t T> uint16_t        Osc<T>::m_rnd_cnt;
+template <uint8_t T> uint8_t         Osc<T>::m_param_binary;
