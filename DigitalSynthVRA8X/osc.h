@@ -23,7 +23,7 @@ class Osc {
 public:
   INLINE static void initialize() {
     m_wave_table = g_osc_sine_wave_table_h1;
-    m_freq = 1;
+    m_freq = g_osc_freq_table[NOTE_NUMBER_MIN];
     reset_phase();
     set_mode(0);
     set_color(0);
@@ -49,9 +49,16 @@ public:
     switch (m_mode) {
     case OSC_MODE_FM:
       {
-        uint8_t old_low_freq = value_to_low_freq(m_color);
-        uint8_t new_low_freq = value_to_low_freq(controller_value);
+        uint8_t old_low_freq = (value_to_low_freq(m_color) >> 1) << 1;
+        uint8_t new_low_freq = (value_to_low_freq(controller_value) >> 1) << 1;
         if (old_low_freq != 0 && new_low_freq == 0) {
+          reset_phase();
+        }
+      }
+      break;
+    case OSC_MODE_ORGAN:
+      {
+        if (m_color != 0 && controller_value == 0) {
           reset_phase();
         }
       }
@@ -113,10 +120,10 @@ public:
         int8_t wave_2 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_2);
         int8_t wave_3 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_3);
 
-        int8_t wave_0 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_0 +
-                          ((wave_2 * high_byte((m_mod_depth + 1) * mod_eg_control)) << 3));
-        int8_t wave_1 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_1 +
-                          ((wave_3 * high_byte((m_mod_depth + 1) * mod_eg_control)) << 3));
+        int8_t wave_0 = get_wave_level(g_osc_sine_wave_table_h1,
+                                       m_phase_0 + ((wave_2 * m_mod_depth) << 3));
+        int8_t wave_1 = get_wave_level(g_osc_sine_wave_table_h1,
+                                       m_phase_1 + ((wave_3 * m_mod_depth) << 3));
 
         result = (wave_0 * 64) + (wave_1 * 32);
       }
@@ -198,8 +205,8 @@ private:
     return value >> 1;
   }
 
-  INLINE static int8_t mod_rate_to_fm_ratio(uint8_t mod_rate) {
-    return (m_mod_rate >> 2) + 1;
+  INLINE static uint8_t mod_rate_to_fm_ratio(uint8_t mod_rate) {
+    return (mod_rate >> 2) + 1;
   }
 
   INLINE static int8_t triangle_lfo_clock(uint8_t mod_eg_control, uint8_t mod_rate) {
