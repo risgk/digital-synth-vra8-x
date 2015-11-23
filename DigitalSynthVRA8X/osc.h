@@ -17,7 +17,7 @@ class Osc {
   static uint8_t        m_color;
   static uint16_t       m_mod_rate;
   static uint16_t       m_mod_depth;
-  static uint8_t        m_rnd_reg;
+  static uint16_t       m_rnd_reg;
   static uint8_t        m_rnd_bit;
   static uint16_t       m_rnd_cnt;
 
@@ -270,8 +270,9 @@ private:
     m_rnd_cnt++;
     if (high_byte(m_rnd_cnt) >= 0x08) {
       m_rnd_cnt = 0;
-      m_rnd_bit = ((m_rnd_reg >> 1) ^ (m_rnd_reg >> 2)) & 1;
-      m_rnd_reg = (m_rnd_reg >> 1) | (m_rnd_bit << 7);
+      m_rnd_bit = ((low_byte(m_rnd_reg) >> 1) ^
+                   (low_byte(m_rnd_reg) >> 2)) & 1;
+      m_rnd_reg = (m_rnd_reg >> 1) | (m_rnd_bit << 15);
     }
     return m_rnd_bit;
   }
@@ -288,6 +289,6 @@ template <uint8_t T> uint8_t         Osc<T>::m_mode;
 template <uint8_t T> uint8_t         Osc<T>::m_color;
 template <uint8_t T> uint16_t        Osc<T>::m_mod_rate;
 template <uint8_t T> uint16_t        Osc<T>::m_mod_depth;
-template <uint8_t T> uint8_t         Osc<T>::m_rnd_reg;
+template <uint8_t T> uint16_t        Osc<T>::m_rnd_reg;
 template <uint8_t T> uint8_t         Osc<T>::m_rnd_bit;
 template <uint8_t T> uint16_t        Osc<T>::m_rnd_cnt;
