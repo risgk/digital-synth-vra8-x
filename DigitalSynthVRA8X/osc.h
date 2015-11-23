@@ -20,7 +20,8 @@ class Osc {
   static uint16_t       m_rnd_reg;
   static uint8_t        m_rnd_bit;
   static uint16_t       m_rnd_cnt;
-  static uint8_t        m_param_binary;
+  static uint8_t        m_param_binary_0;
+  static uint8_t        m_param_binary_1;
 
 public:
   INLINE static void initialize() {
@@ -34,7 +35,8 @@ public:
     m_rnd_reg = ~0;
     m_rnd_bit = 0;
     m_rnd_cnt = 0;
-    m_param_binary = m_color;
+    m_param_binary_0 = m_color;
+    m_param_binary_1 = m_color ^ m_mod_rate;
   }
 
   INLINE static void set_mode(uint8_t controller_value) {
@@ -81,6 +83,18 @@ public:
   }
 
   INLINE static void set_mod_depth(uint8_t controller_value) {
+    switch (m_mode) {
+    case OSC_MODE_BINARY:
+      {
+        uint8_t old_low_freq = value_to_low_freq(m_color);
+        uint8_t new_low_freq = value_to_low_freq(controller_value);
+        if (old_low_freq != 0 && new_low_freq == 0) {
+          reset_phase();
+        }
+      }
+      break;
+    }
+
     m_mod_depth = controller_value << 1;
   }
 
@@ -124,16 +138,33 @@ public:
         uint16_t phase_0_old = m_phase_0;
         m_phase_0 += m_freq;
         if (m_phase_0 < phase_0_old) {
-          m_param_binary = (m_color == 0) ? 1 : m_color;
+          m_param_binary_0 = (m_color == 127) ? ((126 << 1) | 1) : ((m_color << 1) | 1);
         }
 
-        uint8_t curr_index = high_byte(m_phase_0) >> 4;
-        uint8_t next_index = static_cast<uint8_t>(high_byte(m_phase_0) + 16) >> 4;
-        int8_t curr_data = (nth_bit(m_param_binary, curr_index >> 1) != 0) ? 31 : -31;
-        int8_t next_data = (nth_bit(m_param_binary, next_index >> 1) != 0) ? 31 : -31;
-        uint8_t next_weight = (m_phase_0 >> 4) & 0xFF;
-        result = (curr_data << 8) +
-                 (static_cast<int8_t>(next_data - curr_data) * next_weight);
+        uint16_t phase_1_old = m_phase_1;
+        m_phase_1 += m_freq - value_to_low_freq(m_mod_depth >> 1);
+        if (m_phase_1 < phase_1_old) {
+          uint8_t param = m_color ^ m_mod_rate;
+          m_param_binary_1 = (param == 127) ? ((126 << 1) | 1) : ((param << 1) | 1);
+        }
+
+        uint8_t curr_index_0 = high_byte(m_phase_0) >> 4;
+        uint8_t next_index_0 = static_cast<uint8_t>(high_byte(m_phase_0) + 16) >> 4;
+        int8_t curr_data_0 = (nth_bit(m_param_binary_0, curr_index_0 >> 1) != 0) ? 63 : -64;
+        int8_t next_data_0 = (nth_bit(m_param_binary_0, next_index_0 >> 1) != 0) ? 63 : -64;
+        uint8_t next_weight_0 = (m_phase_0 >> 4) & 0xFF;
+        int8_t wave_0 = curr_data_0 +
+                        high_sbyte(static_cast<int8_t>(next_data_0 - curr_data_0) * next_weight_0);
+
+        uint8_t curr_index_1 = high_byte(m_phase_1) >> 4;
+        uint8_t next_index_1 = static_cast<uint8_t>(high_byte(m_phase_1) + 16) >> 4;
+        int8_t curr_data_1 = (nth_bit(m_param_binary_1, curr_index_1 >> 1) != 0) ? 63 : -64;
+        int8_t next_data_1 = (nth_bit(m_param_binary_1, next_index_1 >> 1) != 0) ? 63 : -64;
+        uint8_t next_weight_1 = (m_phase_1 >> 4) & 0xFF;
+        int8_t wave_1 = curr_data_1 +
+                        high_sbyte(static_cast<int8_t>(next_data_1 - curr_data_1) * next_weight_1);
+
+        result = (wave_0 * 64) + (wave_1 * 32);
       }
       break;
     case OSC_MODE_PULSE_SAW:
@@ -308,4 +339,5 @@ template <uint8_t T> uint16_t        Osc<T>::m_mod_depth;
 template <uint8_t T> uint16_t        Osc<T>::m_rnd_reg;
 template <uint8_t T> uint8_t         Osc<T>::m_rnd_bit;
 template <uint8_t T> uint16_t        Osc<T>::m_rnd_cnt;
-template <uint8_t T> uint8_t         Osc<T>::m_param_binary;
+template <uint8_t T> uint8_t         Osc<T>::m_param_binary_0;
+template <uint8_t T> uint8_t         Osc<T>::m_param_binary_1;
