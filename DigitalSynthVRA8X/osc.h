@@ -19,7 +19,7 @@ class Osc {
   static uint8_t        m_color;
   static uint16_t       m_mod_rate;
   static uint16_t       m_mod_depth;
-  static uint8_t        m_lfsr_reg;
+  static uint16_t       m_lfsr_reg;
   static uint8_t        m_lfsr_bit;
   static uint8_t        m_lfsr_count;
 
@@ -95,16 +95,18 @@ public:
     switch (m_mode) {
     case OSC_MODE_FM:
       {
-        uint16_t freq_detune = m_freq - ((value_to_low_freq(m_color) >> 1) << 1);
+        uint16_t freq = m_freq + rnd();
+        uint8_t low_freq = (value_to_low_freq(m_color) >> 1) << 1;
+        uint16_t freq_detune = m_freq - low_freq;
 
         uint8_t fm_ratio = mod_rate_to_fm_ratio(m_mod_rate);
-        uint16_t mod_freq = (m_freq >> 1) * fm_ratio;
-        uint16_t mod_freq_detune = ((freq_detune >> 1) - rnd()) * fm_ratio;
+        uint16_t mod_freq = (freq >> 1) * fm_ratio;
+        uint16_t mod_freq_detune = (freq_detune >> 1) * fm_ratio;
 
         m_phase_2 += mod_freq;
         m_phase_3 += mod_freq_detune;
 
-        m_phase_0 += m_freq;
+        m_phase_0 += freq;
         m_phase_1 += freq_detune;
 
         int8_t wave_2 = get_wave_level(g_osc_sine_wave_table_h1, m_phase_2);
@@ -160,10 +162,10 @@ public:
         uint16_t low_freq_x2 = low_freq << 1;
         uint8_t b = rnd();
         m_phase_0 += m_freq;
-        m_phase_1 += m_freq - low_freq - b;
-        m_phase_2 += m_freq + low_freq + b;
-        m_phase_3 += m_freq - low_freq_x2;
-        m_phase_4 += m_freq + low_freq_x2;
+        m_phase_1 += m_freq - low_freq + b;
+        m_phase_2 += m_freq + low_freq - b;
+        m_phase_3 += m_freq - low_freq_x2 - b;
+        m_phase_4 += m_freq + low_freq_x2 + b;
 
         int8_t wave_0 = get_wave_level(m_wave_table, m_phase_0);
         int8_t wave_1 = get_wave_level(m_wave_table, m_phase_1);
@@ -208,7 +210,7 @@ private:
   }
 
   INLINE static int8_t triangle_lfo_clock(uint8_t mod_eg_control, uint8_t mod_rate) {
-    m_phase_lfo += value_to_low_freq(mod_rate) + 2 - rnd();
+    m_phase_lfo += value_to_low_freq(mod_rate) + 1 + rnd();
     uint16_t level = m_phase_lfo;
     if ((level & 0x8000) != 0) {
       level = ~level;
@@ -272,10 +274,11 @@ private:
   INLINE static uint8_t rnd() {
     m_lfsr_count++;
     if (m_lfsr_count == 0) {
-      m_lfsr_bit = ((m_lfsr_reg >> 1) ^ (m_lfsr_reg >> 2)) & 0x01;
-      m_lfsr_reg = (m_lfsr_reg >> 1) | (m_lfsr_bit << 7);
+      m_lfsr_bit = ((low_byte(m_lfsr_reg) >> 1) ^
+                    (low_byte(m_lfsr_reg) >> 2)) & 0x01;
+      m_lfsr_reg = (m_lfsr_reg >> 1) | (m_lfsr_bit << 15);
     }
-    return m_lfsr_bit;
+    return (m_lfsr_bit << 1);
   }
 };
 
@@ -292,6 +295,6 @@ template <uint8_t T> uint8_t         Osc<T>::m_mode;
 template <uint8_t T> uint8_t         Osc<T>::m_color;
 template <uint8_t T> uint16_t        Osc<T>::m_mod_rate;
 template <uint8_t T> uint16_t        Osc<T>::m_mod_depth;
-template <uint8_t T> uint8_t         Osc<T>::m_lfsr_reg;
+template <uint8_t T> uint16_t        Osc<T>::m_lfsr_reg;
 template <uint8_t T> uint8_t         Osc<T>::m_lfsr_bit;
 template <uint8_t T> uint8_t         Osc<T>::m_lfsr_count;
