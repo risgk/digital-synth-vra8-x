@@ -96,16 +96,11 @@ public:
   INLINE static int16_t clock(uint8_t mod_eg_control) {
     int16_t result = 0;
 
-    update_rnd_bit();
-
     switch (m_mode) {
     case OSC_MODE_FM:
       {
         uint8_t low_freq = (value_to_low_freq(m_color) >> 1) << 1;
         uint16_t freq_detune = m_freq - low_freq;
-        if (low_freq != 0) {
-          freq_detune -= m_rnd_bit << 1;
-        }
 
         uint8_t fm_ratio = mod_rate_to_fm_ratio(m_mod_rate);
         uint16_t mod_freq = (m_freq >> 1) * fm_ratio;
@@ -131,7 +126,7 @@ public:
     case OSC_MODE_BINARY:
       {
         // TODO
-        m_phase_0 += m_freq + (m_rnd_bit << 1);
+        m_phase_0 += m_freq;
         result = get_wave_level(g_osc_sine_wave_table_h1, m_phase_0) * 127;
       }
       break;
@@ -140,7 +135,7 @@ public:
         int8_t mod_lfo_control = triangle_lfo_clock(mod_eg_control, m_mod_rate);
         int16_t shift_lfo = mod_lfo_control * m_mod_depth;
 
-        m_phase_0 += m_freq + (m_rnd_bit << 1);
+        m_phase_0 += m_freq;
 
         int8_t saw_down      = get_wave_level(m_wave_table, m_phase_0);
         int8_t saw_up        = get_wave_level(m_wave_table, m_phase_0 + (128 << 8) - shift_lfo);
@@ -155,7 +150,7 @@ public:
     case OSC_MODE_ORGAN:
       {
         int8_t mod_lfo_control = triangle_lfo_clock(mod_eg_control, m_mod_rate);
-        int16_t freq = m_freq + (m_rnd_bit << 1) + high_sbyte(mod_lfo_control * m_mod_depth);
+        int16_t freq = m_freq + high_sbyte(mod_lfo_control * m_mod_depth);
 
         m_phase_0 += (freq >> 1);
         m_phase_1 += (freq >> 1) + freq;
@@ -167,10 +162,11 @@ public:
       {
         uint16_t low_freq = value_to_low_freq(m_mod_rate) + 2;
         uint16_t low_freq_x2 = low_freq << 1;
-        m_phase_0 += m_freq + m_rnd_bit;
+        uint8_t b = rnd_bit();
+        m_phase_0 += m_freq + b;
         m_phase_1 += m_freq - low_freq;
         m_phase_2 += m_freq + low_freq;
-        m_phase_3 += m_freq - low_freq_x2 - m_rnd_bit;
+        m_phase_3 += m_freq - low_freq_x2 - b;
 
         int8_t wave_0 = get_wave_level(m_wave_table, m_phase_0);
         int8_t wave_1 = get_wave_level(m_wave_table, m_phase_1);
@@ -210,7 +206,7 @@ private:
   }
 
   INLINE static int8_t triangle_lfo_clock(uint8_t mod_eg_control, uint8_t mod_rate) {
-    m_phase_3 += value_to_low_freq(mod_rate) + 1 + m_rnd_bit;
+    m_phase_3 += value_to_low_freq(mod_rate) + 1;
     uint16_t level = m_phase_3;
     if ((level & 0x8000) != 0) {
       level = ~level;
@@ -271,7 +267,7 @@ private:
     return level;
   }
 
-  INLINE static void update_rnd_bit() {
+  INLINE static uint8_t rnd_bit() {
     m_rnd_cnt++;
     if (high_byte(m_rnd_cnt) >= 0x08) {
       m_rnd_cnt = 0;
@@ -279,6 +275,7 @@ private:
                   (low_byte(m_rnd_reg) >> 2)) & 0x01;
       m_rnd_reg = (m_rnd_reg >> 1) | (m_rnd_bit << 7);
     }
+    return m_rnd_bit;
   }
 };
 
