@@ -165,8 +165,8 @@ public:
         int8_t saw_down_1 = get_wave_level(m_wave_table, m_phase[1]);
         int8_t saw_up_1   = get_wave_level(m_wave_table, m_phase[1] + pulse_width);
 
-        uint8_t m = m_mod_depth >> 2;
-        int16_t mixed = ((saw_down_0 - saw_up_0) * static_cast<uint8_t>(192 - m)) +
+        uint8_t m = (m_mod_depth * 3) >> 3;
+        int16_t mixed = ((saw_down_0 - saw_up_0) * static_cast<uint8_t>(190 - m)) +
                         ((saw_down_1 - saw_up_1) * m);
         result = mixed >> 1;
       }
