@@ -152,6 +152,22 @@ public:
         result = mixed >> 1;
       }
       break;
+    case OSC_MODE_PULSE:
+      {
+        int8_t mod_lfo_control = triangle_lfo_clock(mod_eg_control, m_mod_rate);
+        int16_t shift_lfo = mod_lfo_control * m_mod_depth;
+
+        m_phase[0] += m_freq;
+
+        uint16_t pulse_width = (m_color + 128) << 8;
+        int8_t saw_down = get_wave_level(m_wave_table, m_phase[0]);
+        int8_t saw_up   = get_wave_level(m_wave_table, m_phase[0] + pulse_width - shift_lfo);
+
+        int16_t mixed = +(saw_down * 127) +
+                        -(saw_up   * 127);
+        result = mixed >> 1;
+      }
+      break;
     case OSC_MODE_ORGAN:
       {
         int8_t mod_lfo_control = triangle_lfo_clock(mod_eg_control, m_mod_rate);
