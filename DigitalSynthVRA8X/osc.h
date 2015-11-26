@@ -154,17 +154,20 @@ public:
       break;
     case OSC_MODE_PULSE:
       {
-        int8_t mod_lfo_control = triangle_lfo_clock(mod_eg_control, m_mod_rate);
-        int16_t shift_lfo = mod_lfo_control * m_mod_depth;
-
+        uint8_t low_freq = value_to_low_freq(m_mod_rate) + 1;
+        uint16_t freq_detune = m_freq - low_freq;
         m_phase[0] += m_freq;
+        m_phase[1] += freq_detune;
 
         uint16_t pulse_width = (m_color + 128) << 8;
-        int8_t saw_down = get_wave_level(m_wave_table, m_phase[0]);
-        int8_t saw_up   = get_wave_level(m_wave_table, m_phase[0] + pulse_width - shift_lfo);
+        int8_t saw_down_0 = get_wave_level(m_wave_table, m_phase[0]);
+        int8_t saw_up_0   = get_wave_level(m_wave_table, m_phase[0] + pulse_width);
+        int8_t saw_down_1 = get_wave_level(m_wave_table, m_phase[1]);
+        int8_t saw_up_1   = get_wave_level(m_wave_table, m_phase[1] + pulse_width);
 
-        int16_t mixed = +(saw_down * 127) +
-                        -(saw_up   * 127);
+        uint8_t m = m_mod_depth >> 2;
+        int16_t mixed = ((saw_down_0 - saw_up_0) * static_cast<uint8_t>(192 - m)) +
+                        ((saw_down_1 - saw_up_1) * m);
         result = mixed >> 1;
       }
       break;
