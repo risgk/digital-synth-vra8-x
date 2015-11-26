@@ -8,14 +8,11 @@ template <uint8_t T>
 class Osc {
   static const uint8_t* m_wave_table;
   static uint16_t       m_freq;
-  static uint16_t       m_phase[5];
+  static uint16_t       m_phase[6];
   static uint8_t        m_mode;
   static uint8_t        m_color;
   static uint16_t       m_mod_rate;
   static uint16_t       m_mod_depth;
-  static uint16_t       m_rnd_reg;
-  static uint8_t        m_rnd_bit;
-  static uint16_t       m_rnd_cnt;
   static uint8_t        m_param_binary;
 
 public:
@@ -27,9 +24,6 @@ public:
     set_color(0);
     set_mod_rate(0);
     set_mod_depth(0);
-    m_rnd_reg = ~0;
-    m_rnd_bit = 0;
-    m_rnd_cnt = 0;
     m_param_binary = m_color;
   }
 
@@ -184,25 +178,26 @@ public:
       break;
     case OSC_MODE_SAW:
       {
-        uint16_t low_freq = value_to_low_freq(m_mod_rate) + 2;
+        uint16_t low_freq = value_to_low_freq(m_mod_rate) + 1;
         uint16_t low_freq_x2 = low_freq << 1;
-        uint8_t b = rnd();
-        m_phase[0] += m_freq + b;
-        m_phase[1] += m_freq - low_freq - b;
+        m_phase[0] += m_freq;
+        m_phase[1] += m_freq - low_freq;
         m_phase[2] += m_freq + low_freq;
-        m_phase[3] += m_freq - low_freq_x2 + b;
-        m_phase[4] += m_freq + low_freq_x2 - b;
+        m_phase[3] += m_freq - low_freq_x2;
+        m_phase[4] += m_freq + low_freq_x2;
+        m_phase[5] += m_freq - low_freq_x2 - low_freq;
 
         int8_t wave_0 = get_wave_level(m_wave_table, m_phase[0]);
         int8_t wave_1 = get_wave_level(m_wave_table, m_phase[1]);
         int8_t wave_2 = get_wave_level(m_wave_table, m_phase[2]);
         int8_t wave_3 = get_wave_level(m_wave_table, m_phase[3]);
         int8_t wave_4 = get_wave_level(m_wave_table, m_phase[4]);
+        int8_t wave_5 = get_wave_level(m_wave_table, m_phase[5]);
 
-        int8_t d = m_mod_depth >> 2;
+        uint8_t d = (m_mod_depth * 5) >> 6;
         int8_t r = (m_color < 64) ? d : -d;
-        result = (wave_0 * (126 - d)) + (wave_1 * r)        + (wave_2 * d) +
-                                        (wave_3 * (d >> 1)) + (wave_4 * (r >> 1));
+        result = (wave_0 * (117 - (d << 1))) + (wave_1 * r) + (wave_2 * d) +
+                                               (wave_3 * d) + (wave_4 * r) + (wave_5 * d);
       }
       break;
     default:
@@ -223,6 +218,7 @@ private:
     m_phase[2] = 0;
     m_phase[3] = 0;
     m_phase[4] = 0;
+    m_phase[5] = 0;
   }
 
   INLINE static uint8_t value_to_low_freq(uint8_t value) {
@@ -299,27 +295,13 @@ private:
   INLINE static uint8_t nth_bit(uint8_t byte, uint8_t n) {
     return (byte >> n) & 1;
   }
-
-  INLINE static uint8_t rnd() {
-    m_rnd_cnt++;
-    if (high_byte(m_rnd_cnt) >= 0x08) {
-      m_rnd_cnt = 0;
-      m_rnd_bit = ((low_byte(m_rnd_reg) >> 1) ^
-                   (low_byte(m_rnd_reg) >> 2)) & 1;
-      m_rnd_reg = (m_rnd_reg >> 1) | (m_rnd_bit << 15);
-    }
-    return m_rnd_bit;
-  }
 };
 
 template <uint8_t T> const uint8_t*  Osc<T>::m_wave_table;
 template <uint8_t T> uint16_t        Osc<T>::m_freq;
-template <uint8_t T> uint16_t        Osc<T>::m_phase[5];
+template <uint8_t T> uint16_t        Osc<T>::m_phase[6];
 template <uint8_t T> uint8_t         Osc<T>::m_mode;
 template <uint8_t T> uint8_t         Osc<T>::m_color;
 template <uint8_t T> uint16_t        Osc<T>::m_mod_rate;
 template <uint8_t T> uint16_t        Osc<T>::m_mod_depth;
-template <uint8_t T> uint16_t        Osc<T>::m_rnd_reg;
-template <uint8_t T> uint8_t         Osc<T>::m_rnd_bit;
-template <uint8_t T> uint16_t        Osc<T>::m_rnd_cnt;
 template <uint8_t T> uint8_t         Osc<T>::m_param_binary;

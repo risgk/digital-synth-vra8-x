@@ -38,10 +38,10 @@ end
 sound_off
 control_change(OSC_MODE      , 0  )
 control_change(OSC_COLOR     , 0  )
-control_change(MOD_RATE      , 0  )
+control_change(MOD_RATE      , 8  )
 control_change(MOD_DEPTH     , 127)
 control_change(LPF_CUTOFF_ENV, 64 )
-control_change(LPF_RESONANCE , 127)
+control_change(LPF_RESONANCE , 64 )
 control_change(ENV_A         , 32 )
 control_change(ENV_D_R       , 80 )
 play_cegbdfac(3)
