@@ -122,11 +122,15 @@ public:
 
         uint8_t curr_index = high_byte(m_phase[0]) >> 4;
         uint8_t next_index = static_cast<uint8_t>(high_byte(m_phase[0]) + 16) >> 4;
-        int8_t curr_data = (nth_bit(m_param_binary, curr_index >> 1) != 0) ? 24 : -24;
-        int8_t next_data = (nth_bit(m_param_binary, next_index >> 1) != 0) ? 24 : -24;
-        uint8_t next_weight = (m_phase[0] >> 4) & 0xFF;
-        result = (curr_data << 8) +
-                 (static_cast<int8_t>(next_data - curr_data) * next_weight) ;
+        uint16_t curr_p = (nth_bit(m_param_binary, curr_index >> 1) != 0) ? 0x4000 : 0xC000;
+        uint16_t next_p = (nth_bit(m_param_binary, next_index >> 1) != 0) ? 0x4000 : 0xC000;
+        uint16_t next_w = (m_phase[0] & 0xFFF) << 3;
+
+        if (curr_p == next_p) {
+          result = get_wave_level(g_osc_sine_wave_table_h1, curr_p) * 96;
+        } else {
+          result = get_wave_level(g_osc_sine_wave_table_h1, curr_p + next_w) * 96;
+        }
       }
       break;
     case OSC_MODE_PULSE_SAW:
