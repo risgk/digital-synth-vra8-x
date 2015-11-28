@@ -38,8 +38,8 @@ def generate_filter_lpf_table(name, q)
   $file.printf("};\n\n")
 end
 
-generate_filter_lpf_table("q_4", 4.0)
-generate_filter_lpf_table("q_2", 2.0)
-generate_filter_lpf_table("q_sqrt_2", Math.sqrt(2))
+generate_filter_lpf_table("reso_high", 8.0)
+generate_filter_lpf_table("reso_mid", 4.0)
+generate_filter_lpf_table("reso_low", Math.sqrt(2.0))
 
 $file.close

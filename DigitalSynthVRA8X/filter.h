@@ -29,27 +29,27 @@ public:
   }
 
   INLINE static void set_cutoff(uint8_t controller_value) {
-    if (controller_value >= 64) {
-      m_cutoff_base = (controller_value - 64) << 1;
-      m_cutoff_eg_depth = (126 - ((controller_value - 64) << 1)) + 1;
+    if (controller_value < 64) {
+      m_cutoff_base = 126 - (controller_value << 1);
+      m_cutoff_eg_depth = 0;
     } else {
       m_cutoff_base = 0;
-      m_cutoff_eg_depth = (controller_value << 1) + 1;
+      m_cutoff_eg_depth = (controller_value - 64) << 1;
     }
   }
 
   INLINE static void set_resonance(uint8_t controller_value) {
     if (controller_value >= 96) {
-      m_lpf_table = g_filter_lpf_table_q_4;
+      m_lpf_table = g_filter_lpf_table_reso_high;
     } else if (controller_value >= 32) {
-      m_lpf_table = g_filter_lpf_table_q_2;
+      m_lpf_table = g_filter_lpf_table_reso_mid;
     } else {
-      m_lpf_table = g_filter_lpf_table_q_sqrt_2;
+      m_lpf_table = g_filter_lpf_table_reso_low;
     }
   }
 
   INLINE static int16_t clock(int16_t audio_input, uint8_t cutoff_eg_control) {
-    uint8_t cutoff = m_cutoff_base + high_byte(m_cutoff_eg_depth * cutoff_eg_control);
+    uint8_t cutoff = m_cutoff_base + high_byte(m_cutoff_eg_depth * (cutoff_eg_control + 1));
 
     const uint8_t* p = m_lpf_table + (cutoff * 3);
     uint8_t b_2_over_a_0_low  = *p++;
