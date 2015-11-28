@@ -8,7 +8,7 @@ template <uint8_t T>
 class Osc {
   static const uint8_t* m_wave_table;
   static uint16_t       m_freq;
-  static uint16_t       m_phase[7];
+  static uint16_t       m_phase[6];
   static uint8_t        m_mode;
   static uint8_t        m_color;
   static uint16_t       m_mod_rate;
@@ -186,7 +186,6 @@ public:
         m_phase[3] += m_freq - low_freq_x2;
         m_phase[5] += m_freq - low_freq_x2 - low_freq;
         m_phase[4] += m_freq + low_freq_x2;
-        m_phase[6] += m_freq + low_freq_x2 + low_freq;
 
         int8_t wave_0 = get_wave_level(m_wave_table, m_phase[0]);
         int8_t wave_1 = get_wave_level(m_wave_table, m_phase[1]);
@@ -194,12 +193,11 @@ public:
         int8_t wave_3 = get_wave_level(m_wave_table, m_phase[3]);
         int8_t wave_4 = get_wave_level(m_wave_table, m_phase[4]);
         int8_t wave_5 = get_wave_level(m_wave_table, m_phase[5]);
-        int8_t wave_6 = get_wave_level(m_wave_table, m_phase[6]);
 
         uint8_t d = (m_mod_depth * 5) >> 6;
         int8_t r = (m_color < 64) ? d : -d;
-        result = (wave_0 * (117 - (d << 1))) + (wave_1 * r) + (wave_2 * d) + (wave_3 * d) + 
-                                               (wave_4 * r) + (wave_5 * d) + (wave_6 * d);
+        result = (wave_0 * (117 - (d << 1))) + (wave_1 * r) + (wave_2 * r) +
+                 (wave_3 * d) + (wave_4 * d) + (wave_5 * r);
       }
       break;
     default:
@@ -221,7 +219,6 @@ private:
     m_phase[3] = 0;
     m_phase[4] = 0;
     m_phase[5] = 0;
-    m_phase[6] = 0;
   }
 
   INLINE static uint8_t value_to_low_freq(uint8_t value) {
@@ -302,7 +299,7 @@ private:
 
 template <uint8_t T> const uint8_t*  Osc<T>::m_wave_table;
 template <uint8_t T> uint16_t        Osc<T>::m_freq;
-template <uint8_t T> uint16_t        Osc<T>::m_phase[7];
+template <uint8_t T> uint16_t        Osc<T>::m_phase[6];
 template <uint8_t T> uint8_t         Osc<T>::m_mode;
 template <uint8_t T> uint8_t         Osc<T>::m_color;
 template <uint8_t T> uint16_t        Osc<T>::m_mod_rate;
