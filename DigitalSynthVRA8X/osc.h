@@ -112,7 +112,7 @@ public:
     case OSC_MODE_BINARY:
       {
         int8_t mod_lfo_control = triangle_lfo_clock(mod_eg_control, m_mod_rate);
-        int16_t freq = m_freq + high_sbyte(mod_lfo_control * m_mod_depth);
+        int16_t freq = m_freq + high_sbyte((m_mod_depth + 1) * mod_lfo_control);
 
         uint16_t phase_old = m_phase[0];
         m_phase[0] += freq;
@@ -168,7 +168,7 @@ public:
     case OSC_MODE_ORGAN:
       {
         int8_t mod_lfo_control = triangle_lfo_clock(mod_eg_control, m_mod_rate);
-        int16_t freq = m_freq + high_sbyte(mod_lfo_control * m_mod_depth);
+        int16_t freq = m_freq + high_sbyte((m_mod_depth + 1) * mod_lfo_control);
 
         m_phase[0] += (freq >> 1);
         m_phase[1] += (freq >> 1) + freq;
@@ -230,8 +230,8 @@ private:
   }
 
   INLINE static int8_t triangle_lfo_clock(uint8_t mod_eg_control, uint8_t mod_rate) {
-    m_phase[4] += value_to_low_freq(mod_rate) + 1;
-    uint16_t level = m_phase[4];
+    m_phase[5] += value_to_low_freq(mod_rate) + 1;
+    uint16_t level = m_phase[5];
     if ((level & 0x8000) != 0) {
       level = ~level;
     }

@@ -49,7 +49,7 @@ public:
   }
 
   INLINE static int16_t clock(int16_t audio_input, uint8_t cutoff_eg_control) {
-    uint8_t cutoff = m_cutoff_base + high_byte(m_cutoff_eg_depth * (cutoff_eg_control + 1));
+    uint8_t cutoff = m_cutoff_base + high_byte((m_cutoff_eg_depth + 1) * cutoff_eg_control);
 
     const uint8_t* p = m_lpf_table + (cutoff * 3);
     uint8_t b_2_over_a_0_low  = *p++;
