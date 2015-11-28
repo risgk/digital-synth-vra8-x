@@ -39,7 +39,7 @@ def generate_filter_lpf_table(name, q)
 end
 
 generate_filter_lpf_table("reso_high", 8.0)
-generate_filter_lpf_table("reso_mid", 4.0)
+generate_filter_lpf_table("reso_mid", 2.0 * Math.sqrt(2.0))
 generate_filter_lpf_table("reso_low", Math.sqrt(2.0))
 
 $file.close
