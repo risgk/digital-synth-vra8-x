@@ -33,8 +33,8 @@
     +-------------+-----------+--------------+---------------+----------------+------------+
     | OSC MODE    | Name      | Description  | OSC COLOR     | MOD RATE       | MOD DEPTH  |
     +-------------+-----------+--------------+---------------+----------------+------------+
-    | 0           | SAW       | Saw Wave     | PWM Mix       | Detune Range   | Multi Saws |
-    | (0 ~ 7)     |           |              | Off/On        | 1.2 ~ 76.3 Hz  | Mix        |
+    | 0           | SAW       | Saw Wave     | PWM Mix       | Detune         | Multi Saws |
+    | (0 ~ 7)     |           |              | Off/On        | 0.24 ~ 15.3 Hz | Mix        |
     +-------------+-----------+--------------+---------------+----------------+------------+
     | 16          | PULSE     | Pulse Wave   | Pulse Width   | Detune         | Detuned    |
     | (8 ~ 23)    |           |              | 50 ~ 0.4%     | 0.24 ~ 15.3 Hz | Pulse Mix  |
