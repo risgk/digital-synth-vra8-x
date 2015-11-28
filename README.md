@@ -5,17 +5,17 @@
 
 ## Concept
 
-- Experimental Synthesizer (MIDI Sound Module) for Arduino Uno
+- Experimental Synthesizer for Arduino Uno
 
 ## Features
 
-- Sketch for Arduino Uno
+- Monophonic Synthesizer (or MIDI Sound Module)
 - Serial MIDI In (38400 bps), PWM Audio Out (Pin 6), PWM Rate: 62500 Hz
 - Sampling Rate: 15625 Hz, Bit Depth: 8 bits
 - LPF Attenuation Slope: -12 dB/oct
 - Recommending [Hairless MIDI<->Serial Bridge](http://projectgus.github.io/hairless-midiserial/) to connect PC
 - Files
-    - `DigitalSynthVRA8X/DigitalSynthVRA8X.ino` is for Arduino Uno
+    - `DigitalSynthVRA8X/DigitalSynthVRA8X.ino` is a sketch for Arduino Uno
     - `MakeSampleWavFile.cc` is for Debugging on PC, `make-sample-wav-file-cc.bat` makes a sample WAV file
         - Requiring GCC (G++) or other
 

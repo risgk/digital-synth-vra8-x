@@ -39,15 +39,15 @@ public:
     uint8_t release_time;
 
     uint8_t decay_value;
-    if (controller_value >= 64) {
-      decay_time = 255;
-      release_time = (127 - controller_value) >> (6 - EG_CONTROLLER_STEPS_BITS);
-    } else {
-      decay_time = (controller_value >> (6 - EG_CONTROLLER_STEPS_BITS)) + 10;
+    if (controller_value < 64) {
+      decay_time = controller_value >> (6 - EG_CONTROLLER_STEPS_BITS);
       release_time = controller_value >> (6 - EG_CONTROLLER_STEPS_BITS);
+    } else {
+      decay_time = 64 >> (6 - EG_CONTROLLER_STEPS_BITS);
+      release_time = (127 - controller_value) >> (6 - EG_CONTROLLER_STEPS_BITS);
     }
 
-    if (decay_time == 255) {
+    if (decay_time == (64 >> (6 - EG_CONTROLLER_STEPS_BITS))) {
       m_decay_rate = 0;
       m_decay_update_interval = 0;
     } else {
