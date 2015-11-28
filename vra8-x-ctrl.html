@@ -255,8 +255,8 @@ function setRandom() {
   soundOff();
   for (var i = CONTROLLERS_FIRST; i <= CONTROLLERS_LAST; i++) {
     if (i == OSC_MODE) {
-      var r = rand(5);
-      a = [0, 16, 32, 64, 96, 127];
+      var a = [0, 16, 32, 64, 96, 127];
+      var r = rand(a.length);
       v = a[r];
       onChangeControlChange(i, v);
     } else {
