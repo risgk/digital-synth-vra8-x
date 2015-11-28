@@ -127,9 +127,9 @@ public:
         uint16_t next_w = (m_phase[0] & 0xFFF) << 3;
 
         if (curr_p == next_p) {
-          result = get_wave_level(g_osc_sine_wave_table_h1, curr_p) * 96;
+          result = get_wave_level(g_osc_sine_wave_table_h1, curr_p) * 95;
         } else {
-          result = get_wave_level(g_osc_sine_wave_table_h1, curr_p + next_w) * 96;
+          result = get_wave_level(g_osc_sine_wave_table_h1, curr_p + next_w) * 95;
         }
       }
       break;
