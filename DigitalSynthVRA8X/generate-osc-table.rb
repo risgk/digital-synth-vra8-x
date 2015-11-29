@@ -20,7 +20,7 @@ $file.printf("const uint16_t g_osc_freq_table[] = {\n  ")
     freq = freq_from_note_number(note_number)
   end
 
-  $file.printf("%5d,", freq)
+  $file.printf("0x%04X,", freq)
   if note_number == DATA_BYTE_MAX
     $file.printf("\n")
   elsif note_number % 12 == 11
@@ -41,7 +41,8 @@ def generate_osc_wave_table_sawtooth(last)
     end
     level = (level * OSC_WAVE_TABLE_AMPLITUDE).floor.to_i
 
-    $file.printf("%+4d,", level)
+    level += 0x100 if level < 0
+    $file.printf("0x%02X,", level)
     if n == (1 << OSC_WAVE_TABLE_SAMPLES_BITS)
       $file.printf("\n")
     elsif n % 16 == 15
@@ -60,7 +61,8 @@ def generate_osc_wave_table_sine(last)
     level += Math::sin((2.0 * Math::PI) * ((n + 0.5) / (1 << OSC_WAVE_TABLE_SAMPLES_BITS)))
     level = (level * OSC_WAVE_TABLE_AMPLITUDE).floor.to_i
 
-    $file.printf("%+4d,", level)
+    level += 0x100 if level < 0
+    $file.printf("0x%02X,", level)
     if n == (1 << OSC_WAVE_TABLE_SAMPLES_BITS)
       $file.printf("\n")
     elsif n % 16 == 15
