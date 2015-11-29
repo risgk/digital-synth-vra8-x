@@ -200,8 +200,8 @@ public:
 
         uint8_t d = (m_mod_depth * 5) >> 6;
         int8_t r = (m_color < 64) ? d : -d;
-        result = (wave_0 * (117 - (d << 1))) + (wave_1 * r) + (wave_2 * r) +
-                 (wave_3 * d) + (wave_4 * d) + (wave_5 * r);
+        result = (wave_0 * (117 - (d << 1))) + ((wave_1 + wave_2) * r) +
+                 ((wave_3 + wave_4) * d) + (wave_5 * r);
       }
       break;
     default:
