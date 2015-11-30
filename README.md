@@ -1,6 +1,6 @@
-# Digital Synth VRA8-X 1.0.0
+# Digital Synth VRA8-X 1.1.0
 
-- 2015-11-28 ISGK Instruments
+- 2015-11-30 ISGK Instruments
 - <https://github.com/risgk/digital-synth-vra8-x>
 
 ## Concept
@@ -15,9 +15,12 @@
 - LPF Attenuation Slope: -12 dB/oct
 - Recommending [Hairless MIDI<->Serial Bridge](http://projectgus.github.io/hairless-midiserial/) to connect PC
 - Files
-    - `DigitalSynthVRA8X/DigitalSynthVRA8X.ino` is a sketch for Arduino Uno
-    - `MakeSampleWavFile.cc` is for Debugging on PC, `make-sample-wav-file-cc.bat` makes a sample WAV file
+    - `DigitalSynthVRA8X.ino` is a sketch for Arduino Uno
+    - `MakeSampleWavFile.cc` is for Debugging on PC
         - Requiring GCC (G++) or other
+        - `make-sample-wav-file-cc.bat` makes a sample WAV file (in Windows)
+    - `generate-*.rb` generate source files
+        - Requiring a Ruby execution environment
 
 ## VRA8-X CTRL
 
@@ -78,8 +81,8 @@
 
 ## MIDI Implementation Chart
 
-      [Experimental Synthesizer]                                      Date: 2015-11-28       
-      Model  Digital Synth VRA8-X     MIDI Implementation Chart       Version: 1.0.0         
+      [Experimental Synthesizer]                                      Date: 2015-11-30       
+      Model  Digital Synth VRA8-X     MIDI Implementation Chart       Version: 1.1.0         
     +-------------------------------+---------------+---------------+-----------------------+
     | Function...                   | Transmitted   | Recognized    | Remarks               |
     +-------------------------------+---------------+---------------+-----------------------+

@@ -16,7 +16,7 @@ $file.printf("const uint16_t g_eg_attack_rate_table[] = {\n  ")
                              (((1 << EG_CONTROLLER_STEPS_BITS) - 2) / 3.0)))
   rate = (EG_LEVEL_MAX * EG_ATTACK_UPDATE_INTERVAL / (sec * SAMPLING_RATE)).floor.to_i
 
-  $file.printf("%5d,", rate)
+  $file.printf("0x%04X,", rate)
   if time == DATA_BYTE_MAX
     $file.printf("\n")
   elsif time % 16 == 15
@@ -51,7 +51,7 @@ $file.printf("const uint8_t g_eg_decay_release_rate_table[] = {\n  ")
   t = 1 if t == 0
   rate = decay_release_rate(t)
 
-  $file.printf("%5d,", rate)
+  $file.printf("0x%02X,", rate)
   if time == DATA_BYTE_MAX
     $file.printf("\n")
   elsif time % 16 == 15
@@ -68,7 +68,7 @@ $file.printf("const uint16_t g_eg_decay_release_update_interval_table[] = {\n  "
   t = 1 if t == 0
   update_interval = decay_release_update_interval(t)
 
-  $file.printf("%5d,", update_interval)
+  $file.printf("0x%04X,", update_interval)
   if time == DATA_BYTE_MAX
     $file.printf("\n")
   elsif time % 16 == 15

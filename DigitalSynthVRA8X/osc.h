@@ -200,8 +200,8 @@ public:
 
         uint8_t d = (m_mod_depth * 5) >> 6;
         int8_t r = (m_color < 64) ? d : -d;
-        result = (wave_0 * (117 - (d << 1))) + (wave_1 * r) + (wave_2 * r) +
-                 (wave_3 * d) + (wave_4 * d) + (wave_5 * r);
+        result = (wave_0 * (117 - (d << 1))) + ((wave_1 + wave_2) * r) +
+                 ((wave_3 + wave_4) * d) + (wave_5 * r);
       }
       break;
     default:
@@ -259,15 +259,15 @@ private:
     result += (color & (1 << 6)) ? (c++, get_triangle_wave_level(phase_0   << 4)) : 0;  // 8
 
     switch (c) {
-    case 1: result *= 252; break;
-    case 2: result *= 126; break;
-    case 3: result *= 84;  break;
-    case 4: result *= 63;  break;
-    case 5: result *= 50;  break;
-    case 6: result *= 42;  break;
-    case 7: result *= 36;  break;
-    case 8: result *= 32;  break;
-    case 9: result *= 28;  break;
+    case 1: result *= 96; break;
+    case 2: result *= 68; break;
+    case 3: result *= 55; break;
+    case 4: result *= 48; break;
+    case 5: result *= 43; break;
+    case 6: result *= 39; break;
+    case 7: result *= 36; break;
+    case 8: result *= 34; break;
+    case 9: result *= 32; break;
     }
 
     return result;
