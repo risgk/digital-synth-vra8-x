@@ -1,6 +1,6 @@
-# Digital Synth VRA8-X 1.0.0
+# Digital Synth VRA8-X 1.1.0
 
-- 2015-11-28 ISGK Instruments
+- 2015-11-30 ISGK Instruments
 - <https://github.com/risgk/digital-synth-vra8-x>
 
 ## Concept
@@ -81,8 +81,8 @@
 
 ## MIDI Implementation Chart
 
-      [Experimental Synthesizer]                                      Date: 2015-11-28       
-      Model  Digital Synth VRA8-X     MIDI Implementation Chart       Version: 1.0.0         
+      [Experimental Synthesizer]                                      Date: 2015-11-30       
+      Model  Digital Synth VRA8-X     MIDI Implementation Chart       Version: 1.1.0         
     +-------------------------------+---------------+---------------+-----------------------+
     | Function...                   | Transmitted   | Recognized    | Remarks               |
     +-------------------------------+---------------+---------------+-----------------------+
